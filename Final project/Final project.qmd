@@ -1,11 +1,34 @@
 ---
 title: "Final project"
+author:
+  - name: Yishan Lin
+  - name: Yingqi Wang
+  - name: Yiming Ding
+  - name: Ruiqing Cai
 ---
 
-## Quarto
+## 0. Authors Information
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+**Yishan Lin**: JHED ID: *ylin183*; Email: *ylin183\@jh.edu*\
+**Yingqi Wang**: JHED ID: *ywang911*; Email: *ywang911\@jh.edu*\
+**Yiming Ding**: JHED ID: *yding75*; Email: *yding75\@jh.edu*\
+**Ruiqing Cai**: JHED ID: *rcai9*; Email: *rcai9\@jh.edu*
 
-```{r}
-1 + 1
+## 1. Data Preparation
+
+```{r load required packages, warning=FALSE, include=FALSE}
+packages <- c("tidyverse", "haven", "table1", "purrr", 
+              "caret", "parallel", "doParallel")
+for (pkg in packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+```{r loading data}
+demo_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/DEMO_L.XPT")
+diet_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/DR1TOT_L.XPT")
+bp_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/BPXO_L.XPT")
 ```
