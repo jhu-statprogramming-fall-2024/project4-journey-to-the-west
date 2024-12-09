@@ -5,12 +5,12 @@ library(table1)
 library(purrr)
 
 #download NHANES data
-demo_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/DEMO_L.XPT")
-diet_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/DR1TOT_L.XPT")
-bp_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/BPXO_L.XPT")
-body_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/BMX_L.XPT")
-lab_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/TCHOL_L.XPT")
-ques_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2021-2022/BPQ_L.XPT")
+demo_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt")
+diet_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt")
+bp_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt")
+body_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BMX_L.xpt")
+lab_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/TCHOL_L.xpt")
+ques_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPQ_L.xpt")
 
 #select variables needed
 demo_data <- select(demo_data,SEQN,RIDAGEYR,RIAGENDR,RIDRETH3)
