@@ -1,0 +1,79 @@
+---
+title: "Histograms"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+runtime: shiny
+---
+
+```{r}
+# load data from the project
+library(here)
+load(here("data.RData"))
+```
+
+## Column {.sidebar}
+
+Data from NHANES(2021-2023)
+
+```{r}
+textInput("name", "What is the title of the graph?")
+selectInput("variable", label = "Which variable:",
+            choices = c("Please select","Sodium intake", "Systolic Blood Pressure", "Diastolic Blood Pressure"), selected = "Please select")
+selectInput("n_breaks", label = "Number of bins:",
+            choices = c(10, 20, 30), selected = 20)
+checkboxInput("density", "show density curve", FALSE)
+sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+            min = 0.2, max = 4, value = 2, step = 0.4)
+```
+
+## Column
+
+### Distributions of Exposure and Outcome Variables
+
+```{r}
+renderPlot({
+  if(input$density == TRUE){
+    if(input$variable=="Sodium intake"){
+    hist(data$DR1TSODI, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    dens <- density(data$DR1TSODI, adjust = input$bw_adjust)
+    lines(dens, col = "blue")
+    }else{
+      if(input$variable=="Systolic Blood Pressure"){
+    hist(data$sybp, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    dens <- density(data$sybp, adjust = input$bw_adjust)
+    lines(dens, col = "blue")
+    }else{
+      if(input$variable=="Diastolic Blood Pressure"){
+    hist(data$dibp, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    dens <- density(data$dibp, adjust = input$bw_adjust)
+    lines(dens, col = "blue")
+    }else{
+      
+    }
+    }
+    }
+  } else{
+    if(input$variable=="Sodium intake"){
+    hist(data$DR1TSODI, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    }else{
+      if(input$variable=="Systolic Blood Pressure"){
+    hist(data$sybp, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    }else{
+      if(input$variable=="Diastolic Blood Pressure"){
+    hist(data$dibp, probability = TRUE, breaks = as.numeric(input$n_breaks),
+       xlab = "Number of Observations", main = input$name)
+    }else{
+      
+    }
+    }
+    }
+  }
+})
+
+```
