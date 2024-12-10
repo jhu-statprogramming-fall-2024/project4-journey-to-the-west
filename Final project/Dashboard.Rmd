@@ -9,6 +9,8 @@ runtime: shiny
 ```{r}
 # load data from the project
 library(here)
+library(shiny)
+library(flexdashboard)
 load(here("data.RData"))
 ```
 
