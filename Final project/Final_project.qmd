@@ -1,0 +1,208 @@
+---
+title: "Final project"
+author:
+  - name: Yishan Lin
+  - name: Yingqi Wang
+  - name: Yiming Ding
+  - name: Ruiqing Cai
+date: 2024-12-11
+---
+
+## 0. Authors Information
+
+**Yishan Lin**: JHED ID: *ylin183*; Email: *ylin183\@jh.edu*\
+**Yingqi Wang**: JHED ID: *ywang911*; Email: *ywang911\@jh.edu*\
+**Yiming Ding**: JHED ID: *yding75*; Email: *yding75\@jh.edu*\
+**Ruiqing Cai**: JHED ID: *rcai9*; Email: *rcai9\@jh.edu*
+
+## 1. Data Preparation and Robust Analysis
+
+::: callout-note
+## Note
+
+In this section, data *downloading, processing,* and some *initial analysis* were conducted by using the **"functional Programming"** Paradigms
+:::
+
+```{r load required packages, warning=FALSE, include=FALSE}
+packages <- c("tidyverse", "haven", "table1", "purrr", 
+              "caret", "parallel", "doParallel")
+for (pkg in packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+### 1.1 Download and Initial Cleaning
+
+Data are directly downloaded from the [CDC websites](https://wwwn.cdc.gov/Nchs/Data/Nhanes). *For more information see the code*
+
+```{r loading and initial data cleaning, message=FALSE}
+# Create a folder to store all the data
+if (!dir.exists("data")) { # check if folder already exists
+  dir.create("data")
+}
+
+# Setup function to download the data
+download_and_save <- function(url, filename) {
+  filepath <- file.path("data", filename)
+  
+  if (!file.exists(filepath)) { # Check if file already exists
+    message(paste("Downloading", filename, "..."))
+    dataset <- read_xpt(url)
+    saveRDS(dataset, filepath)
+  } else {
+    message(paste(filename, "already exists. Loading from cache."))
+  }
+  
+  readRDS(filepath) # Load the dataset
+}
+ 
+# Function to clean individual datasets
+clean_dataset <- function(data, vars) {
+  data %>% dplyr::select(all_of(vars))
+}
+
+# Selecting data
+datasets <- list(
+  demo = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt",
+    file = "demo_data.rds",
+    vars = c("SEQN", "RIDAGEYR", "RIAGENDR", "RIDRETH3")
+  ),
+  diet = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt",
+    file = "diet_data.rds",
+    vars = c("SEQN", "DR1TSODI", "DR1TKCAL")
+  ),
+  bp = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt",
+    file = "bp_data.rds",
+    vars = c("SEQN", "BPXOSY1", "BPXOSY2", "BPXOSY3", "BPXODI1", "BPXODI2", "BPXODI3")
+  ),
+  body = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BMX_L.xpt",
+    file = "body_data.rds",
+    vars = c("SEQN", "BMXBMI")
+  ),
+  lab = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/TCHOL_L.xpt",
+    file = "lab_data.rds",
+    vars = c("SEQN", "LBXTC")
+  ),
+  ques = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPQ_L.xpt",
+    file = "ques_data.rds",
+    vars = c("SEQN", "BPQ150")
+  )
+)
+
+# Downloading, saving, and cleaning datasets
+nhanes_data <- purrr::map(datasets, function(info) {
+  raw_data <- download_and_save(info$url, info$file)
+  clean_dataset(raw_data, info$vars)
+})
+
+# Merging into single dataframe
+merged_data <- purrr::reduce(nhanes_data, dplyr::left_join, by = "SEQN")
+```
+
+### 1.2 Process and Table 1
+**Table 1:** Characteristics of Study Participants from August 2021 to August 2023
+```{r processing data and table 1, warning=FALSE}
+# Function to preprocess data
+process_data <- function(data) {
+  data %>%
+    dplyr::mutate(
+      RIAGENDR = dplyr::recode_factor(RIAGENDR, `1` = "Male", `2` = "Female"),
+      RIDRETH3 = dplyr::recode_factor(
+        RIDRETH3,
+        `1` = "Mexican American",
+        `2` = "Other Hispanic",
+        `3` = "Non-Hispanic White",
+        `4` = "Non-Hispanic Black",
+        `6` = "Other"
+      ),
+      BPQ150 = dplyr::recode_factor(BPQ150, `1` = "Yes", `2` = "No"),
+      sybp = rowMeans(select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
+      dibp = rowMeans(select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
+    )
+}
+
+# Create Table 1 function
+create_table1 <- function(data) {
+  table1(~ RIDAGEYR + RIAGENDR + RIDRETH3 + DR1TSODI + BMXBMI + sybp + dibp + 
+           BPQ150, data = data)
+}
+
+# Labeling data
+set_labels_and_units <- function(data, labels, units = NULL) {
+  for (var in names(labels)) {
+    label(data[[var]]) <- labels[[var]]
+  }
+  if (!is.null(units)) {
+    for (var in names(units)) {
+      units(data[[var]]) <- units[[var]]
+    }
+  }
+  return(data)
+}
+
+## Define labels and units as named lists
+labels <- list(
+  RIDAGEYR = "Age at Screening",
+  RIAGENDR = "Gender",
+  RIDRETH3 = "Race",
+  BPQ150 = "High Blood Pressure Medication",
+  sybp = "Systolic Blood Pressure",
+  dibp = "Diastolic Blood Pressure",
+  BMXBMI = "Body Mass Index"
+)
+
+units <- list(
+  RIDAGEYR = "Year",
+  sybp = "mmHg",
+  dibp = "mmHg",
+  BMXBMI = "kg/m\u00B2"
+)
+
+# Apply the data processing function
+cleaned_data <- process_data(merged_data)
+
+# Apply labels and units
+cleaned_data <- set_labels_and_units(cleaned_data, labels, units)
+
+# Generate Table 1
+create_table1(cleaned_data)
+
+# Save cleaned data
+readr::write_csv(cleaned_data, "data/NHANES_cleaned_data.csv")
+```
+
+### 1.3 Robust Anlysis
+A stratified Analysis by gender was conducted. 
+
+```{r stratified analysis}
+# Stratification function setup
+stratified_analysis <- function(data, group_var, analysis_func) {
+  split_data <- split(data, data[[group_var]])
+  map(split_data, analysis_func)
+}
+
+# Define analysis function: Calculate summary statistics
+summarize_data <- function(data) {
+  data %>%
+    summarize(
+      mean_age = mean(RIDAGEYR, na.rm = TRUE),
+      mean_sodium = mean(DR1TSODI, na.rm = TRUE),
+      mean_sbp = mean(sybp, na.rm = TRUE),
+      mean_dbp = mean(dibp, na.rm = TRUE),
+      n = n()
+    )
+}
+
+# stratified analysis by gender
+stratified_analysis(cleaned_data, "RIAGENDR", summarize_data)
+
+```
