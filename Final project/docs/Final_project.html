@@ -127,8 +127,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#download-and-initial-cleaning" id="toc-download-and-initial-cleaning" class="nav-link" data-scroll-target="#download-and-initial-cleaning">1.1 Download and Initial Cleaning</a></li>
   <li><a href="#process-and-table-1" id="toc-process-and-table-1" class="nav-link" data-scroll-target="#process-and-table-1">1.2 Process and Table 1</a></li>
+  <li><a href="#robust-anlysis" id="toc-robust-anlysis" class="nav-link" data-scroll-target="#robust-anlysis">1.3 Robust Anlysis</a></li>
   </ul></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section">2.</a></li>
+  <li><a href="#statistical-analysis-for-association-between-sodium-intake-and-blood-pressure" id="toc-statistical-analysis-for-association-between-sodium-intake-and-blood-pressure" class="nav-link" data-scroll-target="#statistical-analysis-for-association-between-sodium-intake-and-blood-pressure">2. Statistical Analysis for Association between Sodium Intake and Blood Pressure</a></li>
+  <li><a href="#conduct-machine-learning-programming-paradigms" id="toc-conduct-machine-learning-programming-paradigms" class="nav-link" data-scroll-target="#conduct-machine-learning-programming-paradigms">3. Conduct Machine Learning Programming Paradigms</a></li>
   </ul>
 </nav>
     </div>
@@ -287,8 +289,8 @@ Note
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">6</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Other"</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      ),</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">BPQ150 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(BPQ150, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Yes"</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"No"</span>),</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">sybp =</span> <span class="fu">rowMeans</span>(<span class="fu">select</span>(., BPXOSY1, BPXOSY2, BPXOSY3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">dibp =</span> <span class="fu">rowMeans</span>(<span class="fu">select</span>(., BPXODI1, BPXODI2, BPXODI3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">sybp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXOSY1, BPXOSY2, BPXOSY3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">dibp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXODI1, BPXODI2, BPXODI3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
@@ -497,9 +499,186 @@ Note
 </details>
 </div>
 </section>
+<section id="robust-anlysis" class="level3">
+<h3 class="anchored" data-anchor-id="robust-anlysis">1.3 Robust Anlysis</h3>
+<p>A stratified Analysis by gender was conducted.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stratification function setup</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>stratified_analysis <span class="ot">&lt;-</span> <span class="cf">function</span>(data, group_var, analysis_func) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Split data into groups</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  split_data <span class="ot">&lt;-</span> <span class="fu">split</span>(data, data[[group_var]])</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply the analysis function and add group label</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  summary_list <span class="ot">&lt;-</span> <span class="fu">map</span>(split_data, <span class="sc">~</span> {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">analysis_func</span>(.x) <span class="sc">%&gt;%</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Gender =</span> <span class="fu">unique</span>(.x[[group_var]])) <span class="co"># Add group label</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine all group summaries into a single table</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  combined_summary <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(summary_list)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return combined table</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  combined_summary</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>summarize_data <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_age =</span> <span class="fu">mean</span>(RIDAGEYR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sodium =</span> <span class="fu">mean</span>(DR1TSODI, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sbp =</span> <span class="fu">mean</span>(sybp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_dbp =</span> <span class="fu">mean</span>(dibp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># stratified analysis by gender</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>stratified_summary <span class="ot">&lt;-</span> <span class="fu">stratified_analysis</span>(cleaned_data, <span class="st">"RIAGENDR"</span>, summarize_data)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(stratified_summary, </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Table 2: Summary of each variables stratified by gender"</span>, </span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Table 2: Summary of each variables stratified by gender</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_age</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_sodium</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_sbp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_dbp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Gender</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">37.12323</td>
+<td style="text-align: right;">3336.134</td>
+<td style="text-align: right;">121.2114</td>
+<td style="text-align: right;">72.55017</td>
+<td style="text-align: right;">5575</td>
+<td style="text-align: left;">Male</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">39.36537</td>
+<td style="text-align: right;">2615.691</td>
+<td style="text-align: right;">117.2749</td>
+<td style="text-align: right;">71.91256</td>
+<td style="text-align: right;">6358</td>
+<td style="text-align: left;">Female</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
 </section>
-<section id="section" class="level1">
-<h1>2.</h1>
+</section>
+<section id="statistical-analysis-for-association-between-sodium-intake-and-blood-pressure" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-analysis-for-association-between-sodium-intake-and-blood-pressure">2. Statistical Analysis for Association between Sodium Intake and Blood Pressure</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure cleaned data is available</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>reg_data <span class="ot">&lt;-</span> cleaned_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">BP_Category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      sybp <span class="sc">&lt;</span> <span class="dv">90</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      sybp <span class="sc">&gt;=</span> <span class="dv">90</span> <span class="sc">&amp;</span> sybp <span class="sc">&lt;=</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"Normal"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      sybp <span class="sc">&gt;</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"High"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Normal"</span>, <span class="st">"High"</span>)), <span class="co"># Ordered levels</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">BP_Binary =</span> <span class="fu">ifelse</span>(sybp <span class="sc">&gt;</span> <span class="dv">130</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="co"># Binary for logistic regression</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 1: Linear Model (Sodium Intake and Blood Pressure)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sybp <span class="sc">~</span> DR1TSODI, <span class="at">data =</span> reg_data)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 2: Linear Model (Age, Gender, Race, Sodium Intake)</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sybp <span class="sc">~</span> DR1TSODI <span class="sc">+</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3, <span class="at">data =</span> reg_data)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 3: Linear Model (Adding more covariates)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>model3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sybp <span class="sc">~</span> DR1TSODI <span class="sc">+</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> BMXBMI <span class="sc">+</span> LBXTC <span class="sc">+</span> BPQ150 <span class="sc">+</span> DR1TKCAL, <span class="at">data =</span> reg_data)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 4: Logistic Regression (Sodium Intake and Blood Pressure)</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>model4 <span class="ot">&lt;-</span> <span class="fu">glm</span>(BP_Binary <span class="sc">~</span> DR1TSODI, <span class="at">data =</span> reg_data, <span class="at">family =</span> binomial)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>model5 <span class="ot">&lt;-</span> <span class="fu">polr</span>(BP_Category <span class="sc">~</span> DR1TSODI, <span class="at">data =</span> reg_data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 6: Ordinal Logistic Regression (Adding age, gender, race)</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>model6 <span class="ot">&lt;-</span> <span class="fu">polr</span>(BP_Category <span class="sc">~</span> DR1TSODI <span class="sc">+</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3, <span class="at">data =</span> reg_data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 7: Ordinal Logistic Regression (Adding more covariates)</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>model7 <span class="ot">&lt;-</span> <span class="fu">polr</span>(BP_Category <span class="sc">~</span> DR1TSODI <span class="sc">+</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> BMXBMI <span class="sc">+</span> LBXTC <span class="sc">+</span> BPQ150 <span class="sc">+</span> DR1TKCAL, <span class="at">data =</span> reg_data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(model1, model2, model3, model4, model5, model6, model7, <span class="at">type =</span> <span class="st">"text"</span>, <span class="at">title =</span> <span class="st">"Regression Models Summary"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Regression Models Summary
+=============================================================================================================================================
+                                                                          Dependent variable:                                                
+                           ------------------------------------------------------------------------------------------------------------------
+                                                             sybp                                            BP_Binary                  BP_Category         
+                                                              OLS                                            logistic                     ordered           
+                                                                                                                                         logistic           
+                                    (1)                     (2)                       (3)               (4)        (5)       (6)       (7)   
+---------------------------------------------------------------------------------------------------------------------------------------------
+DR1TSODI                         -0.00000                 0.0001                   -0.001**           -0.00002  -0.00001  0.00003*   -0.0001 
+                                 (0.0001)                (0.0001)                  (0.0005)          (0.00002)  (0.00002) (0.00002) (0.0001) 
+                                                                                                                                             
+RIDAGEYR                                                 0.427***                  0.374***                               0.057***  0.041*** 
+                                                          (0.010)                   (0.040)                                (0.002)   (0.004) 
+                                                                                                                                             
+RIAGENDRFemale                                           -3.926***                   0.030                                -0.255***   0.133  
+                                                          (0.429)                   (1.000)                                (0.063)   (0.115) 
+                                                                                                                                             
+RIDRETH3Other Hispanic                                    -0.311                     0.874                                -0.254*** -0.245***
+                                                          (0.932)                   (2.410)                                (0.017)   (0.025) 
+                                                                                                                                             
+RIDRETH3Non-Hispanic White                                -0.870                    -1.190                                -0.279*** -0.273***
+                                                          (0.762)                   (2.013)                                (0.056)   (0.083) 
+                                                                                                                                             
+RIDRETH3Non-Hispanic Black                               4.305***                   5.103**                               0.492***  0.322*** 
+                                                          (0.909)                   (2.248)                                (0.028)   (0.049) 
+                                                                                                                                             
+RIDRETH3Other                                             -0.276                     3.724                                -0.227*** 0.161*** 
+                                                          (1.152)                   (3.244)                                (0.005)   (0.006) 
+                                                                                                                                             
+BMXBMI                                                                             -0.133**                                          -0.012  
+                                                                                    (0.067)                                          (0.008) 
+                                                                                                                                             
+LBXTC                                                                              0.047***                                         0.005*** 
+                                                                                    (0.012)                                          (0.001) 
+                                                                                                                                             
+BPQ150No                                                                           4.691***                                         0.433*** 
+                                                                                    (1.396)                                          (0.018) 
+                                                                                                                                             
+DR1TKCAL                                                                           0.002***                                          0.0003  
+                                                                                    (0.001)                                         (0.0002) 
+                                                                                                                                             
+Constant                        119.568***              101.226***                100.310***         -1.106***                               
+                                  (0.509)                 (0.939)                   (4.860)           (0.066)                                
+                                                                                                                                             
+---------------------------------------------------------------------------------------------------------------------------------------------
+Observations                       5,820                   5,431                     1,546             5,820      5,820     5,431     1,546  
+R2                                0.00000                  0.289                     0.080                                                   
+Adjusted R2                       -0.0002                  0.288                     0.074                                                   
+Log Likelihood                                                                                       -3,191.954                              
+Akaike Inf. Crit.                                                                                    6,387.909                               
+Residual Std. Error         18.084 (df = 5818)      15.179 (df = 5423)        18.240 (df = 1534)                                             
+F Statistic                0.0002 (df = 1; 5818) 314.770*** (df = 7; 5423) 12.174*** (df = 11; 1534)                                         
+=============================================================================================================================================
+Note:                                                                                                             *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+</div>
+</div>
+</section>
+<section id="conduct-machine-learning-programming-paradigms" class="level2">
+<h2 class="anchored" data-anchor-id="conduct-machine-learning-programming-paradigms">3. Conduct Machine Learning Programming Paradigms</h2>
 
 
 </section>

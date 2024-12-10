@@ -24,8 +24,8 @@ In this section, data *downloading, processing,* and some *initial analysis* wer
 :::
 
 ```{r load required packages, warning=FALSE, include=FALSE}
-packages <- c("tidyverse", "haven", "table1", "purrr", 
-              "caret", "parallel", "doParallel")
+packages <- c("tidyverse", "haven", "table1", "purrr", "caret", "parallel", 
+              "doParallel", "mice", "randomForest", "MASS", "stargazer")
 for (pkg in packages) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg)
@@ -125,8 +125,8 @@ process_data <- function(data) {
         `6` = "Other"
       ),
       BPQ150 = dplyr::recode_factor(BPQ150, `1` = "Yes", `2` = "No"),
-      sybp = rowMeans(select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
-      dibp = rowMeans(select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
+      sybp = rowMeans(dplyr::select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
+      dibp = rowMeans(dplyr::select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
     )
 }
 
@@ -186,11 +186,22 @@ A stratified Analysis by gender was conducted.
 ```{r stratified analysis}
 # Stratification function setup
 stratified_analysis <- function(data, group_var, analysis_func) {
+  # Split data into groups
   split_data <- split(data, data[[group_var]])
-  map(split_data, analysis_func)
+  
+  # Apply the analysis function and add group label
+  summary_list <- map(split_data, ~ {
+    analysis_func(.x) %>%
+      mutate(Gender = unique(.x[[group_var]])) # Add group label
+  })
+  
+  # Combine all group summaries into a single table
+  combined_summary <- bind_rows(summary_list)
+  
+  # Return combined table
+  combined_summary
 }
 
-# Define analysis function: Calculate summary statistics
 summarize_data <- function(data) {
   data %>%
     summarize(
@@ -203,6 +214,47 @@ summarize_data <- function(data) {
 }
 
 # stratified analysis by gender
-stratified_analysis(cleaned_data, "RIAGENDR", summarize_data)
-
+stratified_summary <- stratified_analysis(cleaned_data, "RIAGENDR", summarize_data)
+knitr::kable(stratified_summary, 
+      caption = "Table 2: Summary of each variables stratified by gender", 
+      format = "html")
 ```
+
+## 2. Statistical Analysis for Association between Sodium Intake and Blood Pressure
+
+```{r Regression model， warning=FALSE}
+# Ensure cleaned data is available
+reg_data <- cleaned_data %>%
+  mutate(
+    BP_Category = case_when(
+      sybp < 90 ~ "Low",
+      sybp >= 90 & sybp <= 130 ~ "Normal",
+      sybp > 130 ~ "High"
+    ) %>% factor(levels = c("Low", "Normal", "High")), # Ordered levels
+    BP_Binary = ifelse(sybp > 130, 1, 0) # Binary for logistic regression
+  )
+
+# Model 1: Linear Model (Sodium Intake and Blood Pressure)
+model1 <- lm(sybp ~ DR1TSODI, data = reg_data)
+
+# Model 2: Linear Model (Age, Gender, Race, Sodium Intake)
+model2 <- lm(sybp ~ DR1TSODI + RIDAGEYR + RIAGENDR + RIDRETH3, data = reg_data)
+
+# Model 3: Linear Model (Adding more covariates)
+model3 <- lm(sybp ~ DR1TSODI + RIDAGEYR + RIAGENDR + RIDRETH3 + BMXBMI + LBXTC + BPQ150 + DR1TKCAL, data = reg_data)
+
+# Model 4: Logistic Regression (Sodium Intake and Blood Pressure)
+model4 <- glm(BP_Binary ~ DR1TSODI, data = reg_data, family = binomial)
+
+# Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)
+model5 <- polr(BP_Category ~ DR1TSODI, data = reg_data, Hess = TRUE)
+
+# Model 6: Ordinal Logistic Regression (Adding age, gender, race)
+model6 <- polr(BP_Category ~ DR1TSODI + RIDAGEYR + RIAGENDR + RIDRETH3, data = reg_data, Hess = TRUE)
+
+# Model 7: Ordinal Logistic Regression (Adding more covariates)
+model7 <- polr(BP_Category ~ DR1TSODI + RIDAGEYR + RIAGENDR + RIDRETH3 + BMXBMI + LBXTC + BPQ150 + DR1TKCAL, data = reg_data, Hess = TRUE)
+
+stargazer(model1, model2, model3, model4, model5, model6, model7, type = "text", title = "Regression Models Summary")
+```
+
