@@ -1,5 +1,14 @@
 project:
-  title: "Final project"
+  type: website
+  output-dir: docs
+  
+website:
+  title: "Final Project"
+    
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
 
-editor: visual
 

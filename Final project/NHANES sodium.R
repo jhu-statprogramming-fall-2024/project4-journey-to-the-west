@@ -5,12 +5,12 @@ library(table1)
 library(purrr)
 
 #download NHANES data
-demo_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_DEMO.xpt")
-diet_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_DR1TOT.xpt")
-bp_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_BPXO.xpt")
-body_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_BMX.xpt")
-lab_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_TCHOL.xpt")
-ques_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/P_BPQ.xpt")
+demo_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt")
+diet_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt")
+bp_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt")
+body_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BMX_L.xpt")
+lab_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/TCHOL_L.xpt")
+ques_data <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPQ_L.xpt")
 
 #select variables needed
 demo_data <- select(demo_data,SEQN,RIDAGEYR,RIAGENDR,RIDRETH3)
@@ -18,7 +18,7 @@ diet_data <- select(diet_data,SEQN,DR1TSODI,DR1TKCAL)
 bp_data <- select(bp_data,SEQN,BPXOSY1:BPXODI3)
 body_data <- select(body_data,SEQN,BMXBMI)
 lab_data <- select(lab_data,SEQN,LBXTC)
-ques_data <- select(ques_data,SEQN,BPQ040A)
+ques_data <- select(ques_data,SEQN,BPQ150)
 
 #join datasets
 demo_data <- left_join(demo_data,diet_data, by="SEQN")
@@ -51,7 +51,7 @@ data <- data %>% mutate(sex=factor(male0female1, levels=c(0,1), labels=c("Male",
 data <- data %>% mutate(white1black2other0=case_when(RIDRETH3==3~ 1, RIDRETH3==4~ 2, .default=0))
 data <- data %>% mutate(race=factor(white1black2other0, levels=c(1,2,0), 
                                       labels=c("White","Black", "Other")))
-data <- data %>% mutate(medno0yes1=case_when(BPQ040A==2~ 0,BPQ040A==1~ 1, .default=NA))
+data <- data %>% mutate(medno0yes1=case_when(BPQ150==2~ 0,BPQ150==1~ 1, .default=NA))
 data <- data %>% mutate(medication=factor(medno0yes1, levels=c(0,1), labels=c("No","Yes")))
 # data <- data %>% mutate(sybp=((BPXOSY1+BPXOSY2+BPXOSY3)/3))
 # data <- data %>% mutate(dibp=((BPXODI1+BPXODI2+BPXODI3)/3))
