@@ -129,12 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#process-and-table-1" id="toc-process-and-table-1" class="nav-link" data-scroll-target="#process-and-table-1">1.2 Process and Table 1</a></li>
   <li><a href="#robust-anlysis" id="toc-robust-anlysis" class="nav-link" data-scroll-target="#robust-anlysis">1.3 Robust Anlysis</a></li>
   </ul></li>
-  <li><a href="#using-s3-to-conduct-object-oriented-programming" id="toc-using-s3-to-conduct-object-oriented-programming" class="nav-link" data-scroll-target="#using-s3-to-conduct-object-oriented-programming">2. Using S3 to Conduct Object-Oriented Programming</a>
-  <ul class="collapse">
-  <li><a href="#setup-s3-object-for-regression-analysis" id="toc-setup-s3-object-for-regression-analysis" class="nav-link" data-scroll-target="#setup-s3-object-for-regression-analysis">2.1 Setup S3 Object for Regression Analysis</a></li>
-  <li><a href="#systolic-blood-pressure" id="toc-systolic-blood-pressure" class="nav-link" data-scroll-target="#systolic-blood-pressure">2.2 Systolic Blood Pressure</a></li>
-  <li><a href="#diastolic-blood-pressure" id="toc-diastolic-blood-pressure" class="nav-link" data-scroll-target="#diastolic-blood-pressure">2.3 Diastolic Blood Pressure</a></li>
-  </ul></li>
+  <li><a href="#using-s3-to-conduct-object-oriented-programming" id="toc-using-s3-to-conduct-object-oriented-programming" class="nav-link" data-scroll-target="#using-s3-to-conduct-object-oriented-programming">2. Using S3 to Conduct Object-Oriented Programming</a></li>
   </ul>
 </nav>
     </div>
@@ -238,7 +233,7 @@ Note
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">diet =</span> <span class="fu">list</span>(</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">url =</span> <span class="st">"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt"</span>,</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"diet_data.rds"</span>,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"DR1TSODI"</span>, <span class="st">"DR1TKCAL"</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"DR1TPOTA"</span>, <span class="st">"DR1TKCAL"</span>)</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">bp =</span> <span class="fu">list</span>(</span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">url =</span> <span class="st">"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt"</span>,</span>
@@ -300,7 +295,7 @@ Note
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Table 1 function</span></span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>create_table1 <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table1</span>(<span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> DR1TSODI <span class="sc">+</span> BMXBMI <span class="sc">+</span> sybp <span class="sc">+</span> dibp <span class="sc">+</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table1</span>(<span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> DR1TPOTA <span class="sc">+</span> BMXBMI <span class="sc">+</span> sybp <span class="sc">+</span> dibp <span class="sc">+</span> </span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>           BPQ150, <span class="at">data =</span> data)</span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
@@ -412,16 +407,16 @@ Note
 <td class="lastrow">948 (7.9%)</td>
 </tr>
 <tr class="even">
-<td class="rowlabel firstrow">Sodium (mg)</td>
+<td class="rowlabel firstrow">Potassium (mg)</td>
 <td class="firstrow"></td>
 </tr>
 <tr class="odd">
 <td class="rowlabel">Mean (SD)</td>
-<td>2940 (1610)</td>
+<td>2340 (1230)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Median [Min, Max]</td>
-<td>2660 [0, 20000]</td>
+<td>2150 [0, 14300]</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
@@ -531,7 +526,7 @@ Note
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_age =</span> <span class="fu">mean</span>(RIDAGEYR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sodium =</span> <span class="fu">mean</span>(DR1TSODI, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sodium =</span> <span class="fu">mean</span>(DR1TPOTA, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sbp =</span> <span class="fu">mean</span>(sybp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_dbp =</span> <span class="fu">mean</span>(dibp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>()</span>
@@ -560,7 +555,7 @@ Note
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">37.12323</td>
-<td style="text-align: right;">3336.134</td>
+<td style="text-align: right;">2602.813</td>
 <td style="text-align: right;">121.2114</td>
 <td style="text-align: right;">72.55017</td>
 <td style="text-align: right;">5575</td>
@@ -568,7 +563,7 @@ Note
 </tr>
 <tr class="even">
 <td style="text-align: right;">39.36537</td>
-<td style="text-align: right;">2615.691</td>
+<td style="text-align: right;">2126.442</td>
 <td style="text-align: right;">117.2749</td>
 <td style="text-align: right;">71.91256</td>
 <td style="text-align: right;">6358</td>
@@ -584,173 +579,125 @@ Note
 </section>
 <section id="using-s3-to-conduct-object-oriented-programming" class="level2">
 <h2 class="anchored" data-anchor-id="using-s3-to-conduct-object-oriented-programming">2. Using S3 to Conduct Object-Oriented Programming</h2>
-<section id="setup-s3-object-for-regression-analysis" class="level3">
-<h3 class="anchored" data-anchor-id="setup-s3-object-for-regression-analysis">2.1 Setup S3 Object for Regression Analysis</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define an S3 class for blood pressure analysis</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">structure</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">data =</span> data, <span class="at">summaries =</span> <span class="fu">list</span>()), <span class="co"># Store the dataset and summaries in the object</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="st">"BPAnalysis"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for cleaning data - SYBP</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>sybp.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj) {</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>data <span class="ot">&lt;-</span> obj<span class="sc">$</span>data <span class="sc">%&gt;%</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Category =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&lt;</span> <span class="dv">90</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&gt;=</span> <span class="dv">90</span> <span class="sc">&amp;</span> sybp <span class="sc">&lt;=</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"Normal"</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&gt;</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"High"</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      ), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Normal"</span>, <span class="st">"High"</span>)),</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Binary =</span> <span class="fu">ifelse</span>(sybp <span class="sc">&gt;</span> <span class="dv">130</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for cleaning data - DIBP</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>dibp.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj) {</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>data <span class="ot">&lt;-</span> obj<span class="sc">$</span>data <span class="sc">%&gt;%</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Category =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        dibp <span class="sc">&lt;</span> <span class="dv">60</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        dibp <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> dibp <span class="sc">&lt;=</span> <span class="dv">80</span> <span class="sc">~</span> <span class="st">"Normal"</span>,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        dibp <span class="sc">&gt;</span> <span class="dv">80</span> <span class="sc">~</span> <span class="st">"High"</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      ), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Normal"</span>, <span class="st">"High"</span>)),</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Binary =</span> <span class="fu">ifelse</span>(dibp <span class="sc">&gt;</span> <span class="dv">80</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for modeling with condition-based formulas</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>model.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base formula</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  response <span class="ot">&lt;-</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) <span class="st">"BP_Binary"</span> <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) <span class="st">"BP_Category"</span> <span class="cf">else</span> response</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(response, <span class="st">"~"</span>, <span class="fu">paste</span>(variables, <span class="at">collapse =</span> <span class="st">" + "</span>)))</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"linear"</span>) {</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) {</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">family =</span> binomial)</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) {</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">polr</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Invalid model type."</span>)</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for summarizing results</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>summary.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, model_description) {</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(obj<span class="sc">$</span>model)) {</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"No model has been created yet."</span>)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>summaries[[model_description]] <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(<span class="fu">summary</span>(obj<span class="sc">$</span>model))</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend S3 to handle all seven models for a given response variable</span></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>run_models.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 1: Linear Model (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), </span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 2: Linear Model (Sodium Intake, Age, Gender, Race)"</span>),</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, </span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), </span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 3: Linear Model (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>),</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"logistic"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 4: Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), </span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 6: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race)"</span>),</span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, </span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), </span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 7: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>)</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model <span class="cf">in</span> models) {</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">model.BPAnalysis</span>(obj, <span class="at">type =</span> model<span class="sc">$</span>type, <span class="at">variables =</span> model<span class="sc">$</span>variables, <span class="at">response =</span> response)</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">summary.BPAnalysis</span>(obj, model<span class="sc">$</span>description)</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to output all summaries as HTML</span></span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>output_summaries <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">output_file =</span> <span class="st">"model_summaries.html"</span>) {</span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="st">"&lt;html&gt;&lt;head&gt;&lt;title&gt;Model Summaries&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Model Summaries&lt;/h1&gt;"</span></span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model_name <span class="cf">in</span> <span class="fu">names</span>(obj<span class="sc">$</span>summaries)) {</span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>    html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>      html_content,</span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;h2&gt;"</span>, model_name, <span class="st">"&lt;/h2&gt;"</span>,</span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;pre&gt;"</span>, <span class="fu">paste</span>(obj<span class="sc">$</span>summaries[[model_name]], <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"&lt;/pre&gt;"</span></span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(html_content, <span class="st">"&lt;/body&gt;&lt;/html&gt;"</span>)</span>
-<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(html_content, output_file)</span>
-<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Summaries written to "</span>, output_file)</span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</section>
-<section id="systolic-blood-pressure" class="level3">
-<h3 class="anchored" data-anchor-id="systolic-blood-pressure">2.2 Systolic Blood Pressure</h3>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run SYBP analysis</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sybp_obj <span class="ot">&lt;-</span> <span class="fu">BPAnalysis</span>(cleaned_data)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>sybp_obj <span class="ot">&lt;-</span> <span class="fu">sybp.BPAnalysis</span>(sybp_obj)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>sybp_obj <span class="ot">&lt;-</span> <span class="fu">run_models.BPAnalysis</span>(sybp_obj, <span class="at">response =</span> <span class="st">"sybp"</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">output_summaries</span>(sybp_obj, <span class="at">output_file =</span> <span class="st">"sybp_model_summaries.html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend the S3 methods to cover all seven models</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define an S3 class for blood pressure analysis</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">structure</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">data =</span> data, <span class="at">summaries =</span> <span class="fu">list</span>()), <span class="co"># Store the dataset and summaries in the object</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="st">"BPAnalysis"</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for cleaning data</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>clean.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj) {</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>data <span class="ot">&lt;-</span> obj<span class="sc">$</span>data <span class="sc">%&gt;%</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&lt;</span> <span class="dv">90</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&gt;=</span> <span class="dv">90</span> <span class="sc">&amp;</span> sybp <span class="sc">&lt;=</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"Normal"</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        sybp <span class="sc">&gt;</span> <span class="dv">130</span> <span class="sc">~</span> <span class="st">"High"</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">%&gt;%</span> <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Normal"</span>, <span class="st">"High"</span>)),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">BP_Binary =</span> <span class="fu">ifelse</span>(sybp <span class="sc">&gt;</span> <span class="dv">130</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for modeling with condition-based formulas</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>model.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>)) {</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base formula</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  response <span class="ot">&lt;-</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) <span class="st">"BP_Binary"</span> <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) <span class="st">"BP_Category"</span> <span class="cf">else</span> <span class="st">"sybp"</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(response, <span class="st">"~"</span>, <span class="fu">paste</span>(variables, <span class="at">collapse =</span> <span class="st">" + "</span>)))</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"linear"</span>) {</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) {</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">family =</span> binomial)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) {</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">polr</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Invalid model type."</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for summarizing results</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>summary.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, model_description) {</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(obj<span class="sc">$</span>model)) {</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"No model has been created yet."</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  summary_text <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(<span class="fu">summary</span>(obj<span class="sc">$</span>model))</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>summaries[[model_description]] <span class="ot">&lt;-</span> summary_text</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend S3 to handle all seven models using conditions</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>run_models.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj) {</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>), <span class="at">description =</span> <span class="st">"Model 1: Linear Model (Sodium Intake and Blood Pressure)"</span>),</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), <span class="at">description =</span> <span class="st">"Model 2: Linear Model (Sodium Intake, Age, Gender, Race)"</span>),</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), <span class="at">description =</span> <span class="st">"Model 3: Linear Model (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>),</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"logistic"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>), <span class="at">description =</span> <span class="st">"Model 4: Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>), <span class="at">description =</span> <span class="st">"Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), <span class="at">description =</span> <span class="st">"Model 6: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race)"</span>),</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TPOTA"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), <span class="at">description =</span> <span class="st">"Model 7: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model <span class="cf">in</span> models) {</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">model.BPAnalysis</span>(obj, <span class="at">type =</span> model<span class="sc">$</span>type, <span class="at">variables =</span> model<span class="sc">$</span>variables)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">summary.BPAnalysis</span>(obj, model<span class="sc">$</span>description)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to output all summaries as HTML</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>output_summaries <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">output_file =</span> <span class="st">"model_summaries.html"</span>) {</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="st">"&lt;html&gt;&lt;head&gt;&lt;title&gt;Model Summaries&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Model Summaries&lt;/h1&gt;"</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model_name <span class="cf">in</span> <span class="fu">names</span>(obj<span class="sc">$</span>summaries)) {</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>      html_content,</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;h2&gt;"</span>, model_name, <span class="st">"&lt;/h2&gt;"</span>,</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;pre&gt;"</span>, <span class="fu">paste</span>(obj<span class="sc">$</span>summaries[[model_name]], <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"&lt;/pre&gt;"</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(html_content, <span class="st">"&lt;/body&gt;&lt;/html&gt;"</span>)</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(html_content, output_file)</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Summaries written to "</span>, output_file)</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an S3 object and run all models</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>bp_obj <span class="ot">&lt;-</span> <span class="fu">BPAnalysis</span>(cleaned_data)</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>bp_obj <span class="ot">&lt;-</span> <span class="fu">clean.BPAnalysis</span>(bp_obj)</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>bp_obj <span class="ot">&lt;-</span> <span class="fu">run_models.BPAnalysis</span>(bp_obj)</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="co"># Output summaries to an HTML file</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="fu">output_summaries</span>(bp_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>Summaries written to sybp_model_summaries.html</code></pre>
+<pre><code>Summaries written to model_summaries.html</code></pre>
 </div>
 </div>
-<p><a href="sybp_model_summaries.html">View Model Summaries in <code>sybp_model_summaries.html</code></a></p>
-</section>
-<section id="diastolic-blood-pressure" class="level3">
-<h3 class="anchored" data-anchor-id="diastolic-blood-pressure">2.3 Diastolic Blood Pressure</h3>
+<p><a href="model_summaries.html">View Model Summaries in <code>model_summaries.html</code></a></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run DIBP analysis</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dibp_obj <span class="ot">&lt;-</span> <span class="fu">BPAnalysis</span>(cleaned_data)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dibp_obj <span class="ot">&lt;-</span> <span class="fu">dibp.BPAnalysis</span>(dibp_obj)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dibp_obj <span class="ot">&lt;-</span> <span class="fu">run_models.BPAnalysis</span>(dibp_obj, <span class="at">response =</span> <span class="st">"dibp"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">output_summaries</span>(dibp_obj, <span class="at">output_file =</span> <span class="st">"dibp_model_summaries.html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Summaries written to dibp_model_summaries.html</code></pre>
-</div>
-</div>
-<p><a href="dibp_model_summaries.html">View Model Summaries in <code>dibp_model_summaries.html</code></a></p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> sybp, <span class="at">fill =</span> RIAGENDR)) <span class="sc">+</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#0073C2FF"</span>, <span class="st">"#EFC000FF"</span>)) <span class="sc">+</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Systolic Blood Pressure by Gender"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Count"</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Gender"</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> sybp, <span class="at">fill =</span> RIAGENDR)) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#0073C2FF"</span>, <span class="st">"#EFC000FF"</span>)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Systolic Blood Pressure by Gender"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Count"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Gender"</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 4415 rows containing non-finite outside the scale range
@@ -759,7 +706,7 @@ Note
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Final_project_files/figure-html/visualization 1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="1111_files/figure-html/visualization 1-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -767,16 +714,16 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 2: Boxplot of Sodium Intake (DR1TSODI) by Gender</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> RIAGENDR, <span class="at">y =</span> DR1TSODI, <span class="at">fill =</span> RIAGENDR)) <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#0073C2FF"</span>, <span class="st">"#EFC000FF"</span>)) <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sodium Intake by Gender"</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Gender"</span>,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sodium Intake (mg)"</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 2: Boxplot of Sodium Intake (DR1TPOTA) by Gender</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> RIAGENDR, <span class="at">y =</span> DR1TPOTA, <span class="at">fill =</span> RIAGENDR)) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#0073C2FF"</span>, <span class="st">"#EFC000FF"</span>)) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Sodium Intake by Gender"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Gender"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sodium Intake (mg)"</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 5239 rows containing non-finite outside the scale range
@@ -785,7 +732,7 @@ Note
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Final_project_files/figure-html/visualization 2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="1111_files/figure-html/visualization 2-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -793,18 +740,18 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 3: Relationship between BMI (BMXBMI) and Systolic Blood Pressure (sybp)</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> BMXBMI, <span class="at">y =</span> sybp, <span class="at">color =</span> RIDRETH3)) <span class="sc">+</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#E41A1C"</span>, <span class="st">"#377EB8"</span>, <span class="st">"#4DAF4A"</span>, <span class="st">"#FF7F00"</span>, <span class="st">"#984EA3"</span>)) <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relationship between BMI and Systolic Blood Pressure by Race"</span>,</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Body Mass Index (kg/m²)"</span>,</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Race"</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 3: Relationship between BMI (BMXBMI) and Systolic Blood Pressure (sybp)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> BMXBMI, <span class="at">y =</span> sybp, <span class="at">color =</span> RIDRETH3)) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#E41A1C"</span>, <span class="st">"#377EB8"</span>, <span class="st">"#4DAF4A"</span>, <span class="st">"#FF7F00"</span>, <span class="st">"#984EA3"</span>)) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relationship between BMI and Systolic Blood Pressure by Race"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Body Mass Index (kg/m²)"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Race"</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
@@ -820,14 +767,13 @@ Note
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Final_project_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="1111_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

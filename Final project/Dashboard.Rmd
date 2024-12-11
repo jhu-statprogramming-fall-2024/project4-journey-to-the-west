@@ -40,19 +40,19 @@ renderPlot({
     hist(data$DR1TSODI, probability = TRUE, breaks = as.numeric(input$n_breaks),
        xlab = "Number of Observations", main = input$name)
     dens <- density(data$DR1TSODI, adjust = input$bw_adjust)
-    lines(dens, col = "blue")
+    lines(dens, col = "red")
     }else{
       if(input$variable=="Systolic Blood Pressure"){
     hist(data$sybp, probability = TRUE, breaks = as.numeric(input$n_breaks),
        xlab = "Number of Observations", main = input$name)
     dens <- density(data$sybp, adjust = input$bw_adjust)
-    lines(dens, col = "blue")
+    lines(dens, col = "red")
     }else{
       if(input$variable=="Diastolic Blood Pressure"){
     hist(data$dibp, probability = TRUE, breaks = as.numeric(input$n_breaks),
        xlab = "Number of Observations", main = input$name)
     dens <- density(data$dibp, adjust = input$bw_adjust)
-    lines(dens, col = "blue")
+    lines(dens, col = "red")
     }else{
       
     }

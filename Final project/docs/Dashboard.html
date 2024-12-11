@@ -274,19 +274,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">hist</span>(data<span class="sc">$</span>DR1TSODI, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">breaks =</span> <span class="fu">as.numeric</span>(input<span class="sc">$</span>n_breaks),</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Number of Observations"</span>, <span class="at">main =</span> input<span class="sc">$</span>name)</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    dens <span class="ot">&lt;-</span> <span class="fu">density</span>(data<span class="sc">$</span>DR1TSODI, <span class="at">adjust =</span> input<span class="sc">$</span>bw_adjust)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"blue"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"red"</span>)</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(input<span class="sc">$</span>variable<span class="sc">==</span><span class="st">"Systolic Blood Pressure"</span>){</span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">hist</span>(data<span class="sc">$</span>sybp, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">breaks =</span> <span class="fu">as.numeric</span>(input<span class="sc">$</span>n_breaks),</span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Number of Observations"</span>, <span class="at">main =</span> input<span class="sc">$</span>name)</span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    dens <span class="ot">&lt;-</span> <span class="fu">density</span>(data<span class="sc">$</span>sybp, <span class="at">adjust =</span> input<span class="sc">$</span>bw_adjust)</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"blue"</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"red"</span>)</span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(input<span class="sc">$</span>variable<span class="sc">==</span><span class="st">"Diastolic Blood Pressure"</span>){</span>
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">hist</span>(data<span class="sc">$</span>dibp, <span class="at">probability =</span> <span class="cn">TRUE</span>, <span class="at">breaks =</span> <span class="fu">as.numeric</span>(input<span class="sc">$</span>n_breaks),</span>
 <span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Number of Observations"</span>, <span class="at">main =</span> input<span class="sc">$</span>name)</span>
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    dens <span class="ot">&lt;-</span> <span class="fu">density</span>(data<span class="sc">$</span>dibp, <span class="at">adjust =</span> input<span class="sc">$</span>bw_adjust)</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"blue"</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(dens, <span class="at">col =</span> <span class="st">"red"</span>)</span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    }<span class="cf">else</span>{</span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>      </span>
 <span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    }</span>
@@ -313,7 +313,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div class="shiny-plot-output html-fill-item" id="outc9e52a43b0a52c51" style="width:100%;height:400px;"></div>
+<div class="shiny-plot-output html-fill-item" id="outa6e954dc64832e74" style="width:100%;height:400px;"></div>
 </div>
 </div>
 
