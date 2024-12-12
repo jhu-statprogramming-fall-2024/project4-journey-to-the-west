@@ -361,11 +361,14 @@ output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
 
 <a href="dibp_model_summaries.html">View Model Summaries in `dibp_model_summaries.html`</a>
 
-```{r visualization 1}
+## 3. Visualization
+### 3.1 Distribution of Systolic Blood Pressure stratified by Gender
+Using `geom_histogram`
+```{r visualization 1, warning=FALSE}
 # Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender
 ggplot(cleaned_data, aes(x = sybp, fill = RIAGENDR)) +
   geom_histogram(binwidth = 5, position = "dodge", color = "black") +
-  scale_fill_manual(values = c("#0073C2FF", "#EFC000FF")) +
+  scale_fill_manual(values = c("#9edbf9", "#ef7135")) +
   labs(
     title = "Distribution of Systolic Blood Pressure by Gender",
     x = "Systolic Blood Pressure (mmHg)",
@@ -375,31 +378,48 @@ ggplot(cleaned_data, aes(x = sybp, fill = RIAGENDR)) +
   theme_classic()
 ```
 
-```{r visualization 2}
+### 3.2 Distribution of Sodium Intake stratified by Gender
+Using `geom_boxplot` to create box plot and `geom_text` to label
+
+```{r visualization 2, warning=FALSE}
+medians <- cleaned_data %>%
+  group_by(RIAGENDR) %>%
+  summarize(median_sodium = median(DR1TSODI, na.rm = TRUE))
+
 # Visualization 2: Boxplot of Sodium Intake (DR1TSODI) by Gender
 ggplot(cleaned_data, aes(x = RIAGENDR, y = DR1TSODI, fill = RIAGENDR)) +
   geom_boxplot() +
-  scale_fill_manual(values = c("#0073C2FF", "#EFC000FF")) +
+  scale_fill_manual(values = c("#94f0ff", "#ffa394")) +
   labs(
     title = "Sodium Intake by Gender",
     x = "Gender",
     y = "Sodium Intake (mg)"
   ) +
+  geom_text(
+    data = medians,
+    aes(x = RIAGENDR, y = median_sodium, label = round(median_sodium, 1)),
+    vjust = -0.5,
+    size = 3
+  ) +
   theme_classic()
 ```
 
-```{r}
-# Visualization 3: Relationship between BMI (BMXBMI) and Systolic Blood Pressure (sybp)
-ggplot(cleaned_data, aes(x = BMXBMI, y = sybp, color = RIDRETH3)) +
+### 3.2 Relationship between Sodium Intake and Diastolic Blood Pressure
+Using `geom_point` to create scatter plot
+
+```{r visualization 3, warning=FALSE}
+# Visualization 3: Relationship between Sodium Intake and Diastolic Blood Pressure (dibp)
+ggplot(cleaned_data, aes(x = DR1TSODI, y = dibp, color = RIDRETH3)) +
   geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", se = FALSE, color = "black") +
-  scale_color_manual(values = c("#E41A1C", "#377EB8", "#4DAF4A", "#FF7F00", "#984EA3")) +
+  scale_color_manual(values = c("#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
   labs(
-    title = "Relationship between BMI and Systolic Blood Pressure by Race",
-    x = "Body Mass Index (kg/m²)",
-    y = "Systolic Blood Pressure (mmHg)",
+    title = "Relationship between Sodium Intake and Diastolic Blood Pressure by Race",
+    x = "Sodium Intake (mg)",
+    y = "Diastolic Blood Pressure (mmHg)",
     color = "Race"
   ) +
-  theme_minimal()
+  theme_classic()
 ```
+
+
 
