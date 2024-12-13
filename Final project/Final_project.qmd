@@ -68,12 +68,12 @@ datasets <- list(
   demo = list(
     url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt",
     file = "demo_data.rds",
-    vars = c("SEQN", "RIDAGEYR", "RIAGENDR", "RIDRETH3")
+    vars = c("SEQN", "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2")
   ),
   diet = list(
     url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt",
     file = "diet_data.rds",
-    vars = c("SEQN", "DR1TSODI", "DR1TKCAL")
+    vars = c("SEQN", "DR1TSODI", "DRQSDT3", "DR1TFIBE", "DR1TPOTA", "DR1TCALC", "DR1TMAGN", "DR1TKCAL")
   ),
   bp = list(
     url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt",
@@ -113,6 +113,7 @@ merged_data <- purrr::reduce(nhanes_data, dplyr::left_join, by = "SEQN")
 # Function to preprocess data
 process_data <- function(data) {
   data %>%
+    dplyr::filter(RIDAGEYR >= 20) %>%
     dplyr::mutate(
       RIAGENDR = dplyr::recode_factor(RIAGENDR, `1` = "Male", `2` = "Female"),
       RIDRETH3 = dplyr::recode_factor(
@@ -121,9 +122,19 @@ process_data <- function(data) {
         `2` = "Other Hispanic",
         `3` = "Non-Hispanic White",
         `4` = "Non-Hispanic Black",
-        `6` = "Other"
+        `6` = "Non-Hispanic Asian",
+        `7` = "Other Race - Including Multi-Racial"
+      ),
+      DMDEDUC2 = dplyr::recode_factor(
+        DMDEDUC2,
+        `1` = "Less than 9th grade",
+        `2` = "9-11th grade (Includes 12th grade with no diploma)",
+        `3` = "High school graduate/GED or equivalent",
+        `4` = "Some college or AA degree",
+        `5` = "College graduate or above"
       ),
       BPQ150 = dplyr::recode_factor(BPQ150, `1` = "Yes", `2` = "No"),
+      DRQSDT3 = dplyr::recode_factor(DRQSDT3, `3` = "Yes"),
       sybp = rowMeans(dplyr::select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
       dibp = rowMeans(dplyr::select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
     )
@@ -131,8 +142,7 @@ process_data <- function(data) {
 
 # Create Table 1 function
 create_table1 <- function(data) {
-  table1(~ RIDAGEYR + RIAGENDR + RIDRETH3 + DR1TSODI + BMXBMI + sybp + dibp + 
-           BPQ150, data = data)
+  table1(~ RIDAGEYR + RIAGENDR + RIDRETH3 + DR1TSODI + DR1TPOTA + DR1TCALC + DR1TMAGN + DR1TFIBE + BMXBMI + sybp + dibp + BPQ150, data = data)
 }
 
 # Labeling data
@@ -205,7 +215,11 @@ summarize_data <- function(data) {
   data %>%
     summarize(
       mean_age = mean(RIDAGEYR, na.rm = TRUE),
-      mean_sodium = mean(DR1TSODI, na.rm = TRUE),
+      mean_Na = mean(DR1TSODI, na.rm = TRUE),
+      mean_K = mean(DR1TPOTA, na.rm = TRUE),
+      mean_Mg = mean(DR1TMAGN, na.rm = TRUE),
+      mean_Ca = mean(DR1TCALC, na.rm = TRUE), 
+      mean_fiber = mean(DR1TFIBE, na.rm = TRUE),
       mean_sbp = mean(sybp, na.rm = TRUE),
       mean_dbp = mean(dibp, na.rm = TRUE),
       n = n()
@@ -261,7 +275,10 @@ dibp.BPAnalysis <- function(obj) {
 }
 
 # S3 method for modeling with condition-based formulas
-model.BPAnalysis <- function(obj, type = "linear", variables = c("DR1TSODI"), response = "sybp") {
+model.BPAnalysis <- function(obj, type = "linear", 
+                             variables = c("DR1TSODI", "DR1TFIBE", "DR1TPOTA", 
+                                           "DR1TCALC", "DR1TMAGN"), 
+                             response = "sybp") {
   # Base formula
   response <- if (type == "logistic") "BP_Binary" else if (type == "ordinal") "BP_Category" else response
   formula <- as.formula(paste(response, "~", paste(variables, collapse = " + ")))
@@ -289,27 +306,28 @@ summary.BPAnalysis <- function(obj, model_description) {
 
 # Extend S3 to handle all seven models for a given response variable
 run_models.BPAnalysis <- function(obj, response = "sybp") {
+  dietary_intake <- c("DR1TSODI", "DR1TFIBE", "DR1TPOTA", "DR1TCALC", "DR1TMAGN")
   models <- list(
-    list(type = "linear", variables = c("DR1TSODI"), 
-         description = "Model 1: Linear Model (Sodium Intake and Blood Pressure)"),
+    list(type = "linear", variables = c(dietary_intake), 
+         description = "Model 1: Linear Model (5 Dietary Intake Nutrients and Blood Pressure)"),
     list(type = "linear", 
-         variables = c("DR1TSODI", "RIDAGEYR", "RIAGENDR", "RIDRETH3"), 
-         description = "Model 2: Linear Model (Sodium Intake, Age, Gender, Race)"),
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2"), 
+         description = "Model 2: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"),
     list(type = "linear", 
-         variables = c("DR1TSODI", "RIDAGEYR", "RIAGENDR", "RIDRETH3", 
-                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL"), 
-         description = "Model 3: Linear Model (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"),
-    list(type = "logistic", variables = c("DR1TSODI"), 
-         description = "Model 4: Logistic Regression (Sodium Intake and Blood Pressure)"),
-    list(type = "ordinal", variables = c("DR1TSODI"), 
-         description = "Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)"),
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2", 
+                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL", "DR1TSODI"), 
+         description = "Model 3: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)"),
+    list(type = "logistic", variables = c(dietary_intake), 
+         description = "Model 4: Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"),
+    list(type = "ordinal", variables = c(dietary_intake), 
+         description = "Model 5: Ordinal Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"),
     list(type = "ordinal", 
-         variables = c("DR1TSODI", "RIDAGEYR", "RIAGENDR", "RIDRETH3"), 
-         description = "Model 6: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race)"),
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2"), 
+         description = "Model 6: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"),
     list(type = "ordinal", 
-         variables = c("DR1TSODI", "RIDAGEYR", "RIAGENDR", "RIDRETH3", 
-                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL"), 
-         description = "Model 7: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)")
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2", 
+                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL", "DR1TSODI"), 
+         description = "Model 7: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)")
   )
 
   for (model in models) {
@@ -340,7 +358,7 @@ output_summaries <- function(obj, output_file = "model_summaries.html") {
 
 ### 2.2 Systolic Blood Pressure
 
-```{r S3 sybp}
+```{r S3 sybp, warning=FALSE}
 # Run SYBP analysis
 sybp_obj <- BPAnalysis(cleaned_data)
 sybp_obj <- sybp.BPAnalysis(sybp_obj)
@@ -351,7 +369,7 @@ output_summaries(sybp_obj, output_file = "sybp_model_summaries.html")
 
 ### 2.3 Diastolic Blood Pressure
 
-```{r S3 dibp}
+```{r S3 dibp, warning=FALSE}
 # Run DIBP analysis
 dibp_obj <- BPAnalysis(cleaned_data)
 dibp_obj <- dibp.BPAnalysis(dibp_obj)
@@ -365,17 +383,23 @@ output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
 ### 3.1 Distribution of Systolic Blood Pressure stratified by Gender
 Using `geom_histogram`
 ```{r visualization 1, warning=FALSE}
-# Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender
-ggplot(cleaned_data, aes(x = sybp, fill = RIAGENDR)) +
-  geom_histogram(binwidth = 5, position = "dodge", color = "black") +
-  scale_fill_manual(values = c("#9edbf9", "#ef7135")) +
+# # Visualization 1: Distribution of Systolic Blood Pressure by Education Status using Density Plot
+ggplot(cleaned_data, aes(x = sybp, color = DMDEDUC2)) +
+  geom_density(size = 1, linetype = "solid") +  # Ensure all lines are solid
+  scale_color_brewer(palette = "Set3") +
   labs(
-    title = "Distribution of Systolic Blood Pressure by Gender",
+    title = "Density Plot of Systolic Blood Pressure by Education Status",
     x = "Systolic Blood Pressure (mmHg)",
-    y = "Count",
-    fill = "Gender"
+    y = "Density",
+    color = "Education Level"
   ) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "right",
+        legend.box = "horizontal",
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8),
+        plot.title = element_text(size = 14, face = "bold"),
+        axis.title = element_text(size = 12))
 ```
 
 ### 3.2 Distribution of Sodium Intake stratified by Gender
@@ -409,12 +433,12 @@ Using `geom_point` to create scatter plot
 
 ```{r visualization 3, warning=FALSE}
 # Visualization 3: Relationship between Sodium Intake and Diastolic Blood Pressure (dibp)
-ggplot(cleaned_data, aes(x = DR1TSODI, y = dibp, color = RIDRETH3)) +
+ggplot(cleaned_data, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
   geom_point(alpha = 0.7) +
-  scale_color_manual(values = c("#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
+  scale_color_manual(values = c("#E69F00", "#009E73", "#56B4E9", "#0072B2", "#D55E00", "#CC79A7")) +
   labs(
     title = "Relationship between Sodium Intake and Diastolic Blood Pressure by Race",
-    x = "Sodium Intake (mg)",
+    x = "Potassium Intake (mg)",
     y = "Diastolic Blood Pressure (mmHg)",
     color = "Race"
   ) +
