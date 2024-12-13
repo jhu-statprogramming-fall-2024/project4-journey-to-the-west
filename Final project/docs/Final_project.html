@@ -239,12 +239,12 @@ Note
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">demo =</span> <span class="fu">list</span>(</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">url =</span> <span class="st">"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt"</span>,</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"demo_data.rds"</span>,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"DMDEDUC2"</span>)</span>
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">diet =</span> <span class="fu">list</span>(</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">url =</span> <span class="st">"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt"</span>,</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="st">"diet_data.rds"</span>,</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"DR1TSODI"</span>, <span class="st">"DR1TKCAL"</span>)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"SEQN"</span>, <span class="st">"DR1TSODI"</span>, <span class="st">"DRQSDT3"</span>, <span class="st">"DR1TFIBE"</span>, <span class="st">"DR1TPOTA"</span>, <span class="st">"DR1TCALC"</span>, <span class="st">"DR1TMAGN"</span>, <span class="st">"DR1TKCAL"</span>)</span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">bp =</span> <span class="fu">list</span>(</span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">url =</span> <span class="st">"https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt"</span>,</span>
@@ -288,67 +288,77 @@ Note
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to preprocess data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>process_data <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">RIAGENDR =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(RIAGENDR, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Male"</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Female"</span>),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">RIDRETH3 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        RIDRETH3,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mexican American"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Other Hispanic"</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Non-Hispanic White"</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Non-Hispanic Black"</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">6</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Other"</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">BPQ150 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(BPQ150, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Yes"</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"No"</span>),</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">sybp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXOSY1, BPXOSY2, BPXOSY3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">dibp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXODI1, BPXODI2, BPXODI3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Table 1 function</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>create_table1 <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table1</span>(<span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> DR1TSODI <span class="sc">+</span> BMXBMI <span class="sc">+</span> sybp <span class="sc">+</span> dibp <span class="sc">+</span> </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>           BPQ150, <span class="at">data =</span> data)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Labeling data</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>set_labels_and_units <span class="ot">&lt;-</span> <span class="cf">function</span>(data, labels, <span class="at">units =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">names</span>(labels)) {</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">label</span>(data[[var]]) <span class="ot">&lt;-</span> labels[[var]]</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(units)) {</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">names</span>(units)) {</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">units</span>(data[[var]]) <span class="ot">&lt;-</span> units[[var]]</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="do">## Define labels and units as named lists</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDAGEYR =</span> <span class="st">"Age at Screening"</span>,</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIAGENDR =</span> <span class="st">"Gender"</span>,</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDRETH3 =</span> <span class="st">"Race"</span>,</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">BPQ150 =</span> <span class="st">"High Blood Pressure Medication"</span>,</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">sybp =</span> <span class="st">"Systolic Blood Pressure"</span>,</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">dibp =</span> <span class="st">"Diastolic Blood Pressure"</span>,</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">BMXBMI =</span> <span class="st">"Body Mass Index"</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>units <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDAGEYR =</span> <span class="st">"Year"</span>,</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">sybp =</span> <span class="st">"mmHg"</span>,</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">dibp =</span> <span class="st">"mmHg"</span>,</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">BMXBMI =</span> <span class="st">"kg/m\u00B2"</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the data processing function</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>cleaned_data <span class="ot">&lt;-</span> <span class="fu">process_data</span>(merged_data)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(RIDAGEYR <span class="sc">&gt;=</span> <span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">RIAGENDR =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(RIAGENDR, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Male"</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Female"</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">RIDRETH3 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        RIDRETH3,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mexican American"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Other Hispanic"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Non-Hispanic White"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Non-Hispanic Black"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">6</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Non-Hispanic Asian"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">7</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Other Race - Including Multi-Racial"</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">DMDEDUC2 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        DMDEDUC2,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Less than 9th grade"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"9-11th grade (Includes 12th grade with no diploma)"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"High school graduate/GED or equivalent"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Some college or AA degree"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">5</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"College graduate or above"</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">BPQ150 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(BPQ150, <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Yes"</span>, <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"No"</span>),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">DRQSDT3 =</span> dplyr<span class="sc">::</span><span class="fu">recode_factor</span>(DRQSDT3, <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Yes"</span>),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">sybp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXOSY1, BPXOSY2, BPXOSY3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">dibp =</span> <span class="fu">rowMeans</span>(dplyr<span class="sc">::</span><span class="fu">select</span>(., BPXODI1, BPXODI2, BPXODI3), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Table 1 function</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>create_table1 <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">table1</span>(<span class="sc">~</span> RIDAGEYR <span class="sc">+</span> RIAGENDR <span class="sc">+</span> RIDRETH3 <span class="sc">+</span> DR1TSODI <span class="sc">+</span> DR1TPOTA <span class="sc">+</span> DR1TCALC <span class="sc">+</span> DR1TMAGN <span class="sc">+</span> DR1TFIBE <span class="sc">+</span> BMXBMI <span class="sc">+</span> sybp <span class="sc">+</span> dibp <span class="sc">+</span> BPQ150, <span class="at">data =</span> data)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Labeling data</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>set_labels_and_units <span class="ot">&lt;-</span> <span class="cf">function</span>(data, labels, <span class="at">units =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">names</span>(labels)) {</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">label</span>(data[[var]]) <span class="ot">&lt;-</span> labels[[var]]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(units)) {</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (var <span class="cf">in</span> <span class="fu">names</span>(units)) {</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>      <span class="fu">units</span>(data[[var]]) <span class="ot">&lt;-</span> units[[var]]</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="do">## Define labels and units as named lists</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDAGEYR =</span> <span class="st">"Age at Screening"</span>,</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIAGENDR =</span> <span class="st">"Gender"</span>,</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDRETH3 =</span> <span class="st">"Race"</span>,</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">BPQ150 =</span> <span class="st">"High Blood Pressure Medication"</span>,</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">sybp =</span> <span class="st">"Systolic Blood Pressure"</span>,</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">dibp =</span> <span class="st">"Diastolic Blood Pressure"</span>,</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">BMXBMI =</span> <span class="st">"Body Mass Index"</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply labels and units</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>cleaned_data <span class="ot">&lt;-</span> <span class="fu">set_labels_and_units</span>(cleaned_data, labels, units)</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Table 1</span></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="fu">create_table1</span>(cleaned_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>units <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  <span class="at">RIDAGEYR =</span> <span class="st">"Year"</span>,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">sybp =</span> <span class="st">"mmHg"</span>,</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  <span class="at">dibp =</span> <span class="st">"mmHg"</span>,</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">BMXBMI =</span> <span class="st">"kg/m\u00B2"</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the data processing function</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>cleaned_data <span class="ot">&lt;-</span> <span class="fu">process_data</span>(merged_data)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply labels and units</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>cleaned_data <span class="ot">&lt;-</span> <span class="fu">set_labels_and_units</span>(cleaned_data, labels, units)</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Table 1</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a><span class="fu">create_table1</span>(cleaned_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div class="Rtable1">
@@ -361,7 +371,7 @@ Note
 <tr class="header">
 <th class="rowlabel firstrow lastrow" data-quarto-table-cell-role="th"></th>
 <th class="firstrow lastrow" data-quarto-table-cell-role="th"><span class="stratlabel">Overall<br>
-<span class="stratn">(N=11933)</span></span></th>
+<span class="stratn">(N=7809)</span></span></th>
 </tr>
 </thead>
 <tbody>
@@ -371,11 +381,11 @@ Note
 </tr>
 <tr class="even">
 <td class="rowlabel">Mean (SD)</td>
-<td>38.3 (25.6)</td>
+<td>53.6 (17.5)</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Median [Min, Max]</td>
-<td class="lastrow">37.0 [0, 80.0]</td>
+<td class="lastrow">57.0 [20.0, 80.0]</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">Gender</td>
@@ -383,11 +393,11 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Male</td>
-<td>5575 (46.7%)</td>
+<td>3488 (44.7%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel lastrow">Female</td>
-<td class="lastrow">6358 (53.3%)</td>
+<td class="lastrow">4321 (55.3%)</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel firstrow">Race</td>
@@ -395,27 +405,27 @@ Note
 </tr>
 <tr class="even">
 <td class="rowlabel">Mexican American</td>
-<td>1117 (9.4%)</td>
+<td>545 (7.0%)</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel">Other Hispanic</td>
-<td>1373 (11.5%)</td>
+<td>780 (10.0%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Non-Hispanic White</td>
-<td>6217 (52.1%)</td>
+<td>4555 (58.3%)</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel">Non-Hispanic Black</td>
-<td>1597 (13.4%)</td>
+<td>995 (12.7%)</td>
 </tr>
 <tr class="even">
-<td class="rowlabel">Other</td>
-<td>681 (5.7%)</td>
+<td class="rowlabel">Non-Hispanic Asian</td>
+<td>422 (5.4%)</td>
 </tr>
 <tr class="odd">
-<td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">948 (7.9%)</td>
+<td class="rowlabel lastrow">Other Race - Including Multi-Racial</td>
+<td class="lastrow">512 (6.6%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">Sodium (mg)</td>
@@ -423,15 +433,79 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Mean (SD)</td>
-<td>2940 (1610)</td>
+<td>3070 (1620)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Median [Min, Max]</td>
-<td>2660 [0, 20000]</td>
+<td>2770 [0, 20000]</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">5239 (43.9%)</td>
+<td class="lastrow">3011 (38.6%)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel firstrow">Potassium (mg)</td>
+<td class="firstrow"></td>
+</tr>
+<tr class="odd">
+<td class="rowlabel">Mean (SD)</td>
+<td>2480 (1280)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel">Median [Min, Max]</td>
+<td>2290 [0, 14300]</td>
+</tr>
+<tr class="odd">
+<td class="rowlabel lastrow">Missing</td>
+<td class="lastrow">3011 (38.6%)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel firstrow">Calcium (mg)</td>
+<td class="firstrow"></td>
+</tr>
+<tr class="odd">
+<td class="rowlabel">Mean (SD)</td>
+<td>882 (556)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel">Median [Min, Max]</td>
+<td>770 [0, 9270]</td>
+</tr>
+<tr class="odd">
+<td class="rowlabel lastrow">Missing</td>
+<td class="lastrow">3011 (38.6%)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel firstrow">Magnesium (mg)</td>
+<td class="firstrow"></td>
+</tr>
+<tr class="odd">
+<td class="rowlabel">Mean (SD)</td>
+<td>294 (159)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel">Median [Min, Max]</td>
+<td>264 [0, 2230]</td>
+</tr>
+<tr class="odd">
+<td class="rowlabel lastrow">Missing</td>
+<td class="lastrow">3011 (38.6%)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel firstrow">Dietary fiber (gm)</td>
+<td class="firstrow"></td>
+</tr>
+<tr class="odd">
+<td class="rowlabel">Mean (SD)</td>
+<td>16.2 (10.5)</td>
+</tr>
+<tr class="even">
+<td class="rowlabel">Median [Min, Max]</td>
+<td>14.1 [0, 127]</td>
+</tr>
+<tr class="odd">
+<td class="rowlabel lastrow">Missing</td>
+<td class="lastrow">3011 (38.6%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">Body Mass Index (kg/m²)</td>
@@ -439,15 +513,15 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Mean (SD)</td>
-<td>27.2 (8.14)</td>
+<td>29.8 (7.36)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Median [Min, Max]</td>
-<td>26.4 [11.1, 74.8]</td>
+<td>28.5 [11.1, 74.8]</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">3462 (29.0%)</td>
+<td class="lastrow">1839 (23.5%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">Systolic Blood Pressure (mmHg)</td>
@@ -455,15 +529,15 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Mean (SD)</td>
-<td>119 (18.2)</td>
+<td>123 (18.1)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Median [Min, Max]</td>
-<td>116 [70.0, 232]</td>
+<td>120 [70.0, 232]</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">4415 (37.0%)</td>
+<td class="lastrow">1946 (24.9%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">Diastolic Blood Pressure (mmHg)</td>
@@ -471,15 +545,15 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Mean (SD)</td>
-<td>72.2 (11.5)</td>
+<td>74.7 (11.0)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">Median [Min, Max]</td>
-<td>71.7 [34.0, 139]</td>
+<td>74.0 [34.0, 139]</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">4415 (37.0%)</td>
+<td class="lastrow">1946 (24.9%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel firstrow">High Blood Pressure Medication</td>
@@ -487,15 +561,15 @@ Note
 </tr>
 <tr class="odd">
 <td class="rowlabel">Yes</td>
-<td>2442 (20.5%)</td>
+<td>2437 (31.2%)</td>
 </tr>
 <tr class="even">
 <td class="rowlabel">No</td>
-<td>523 (4.4%)</td>
+<td>503 (6.4%)</td>
 </tr>
 <tr class="odd">
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">8968 (75.2%)</td>
+<td class="lastrow">4869 (62.4%)</td>
 </tr>
 </tbody>
 </table>
@@ -537,18 +611,22 @@ Note
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_age =</span> <span class="fu">mean</span>(RIDAGEYR, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sodium =</span> <span class="fu">mean</span>(DR1TSODI, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sbp =</span> <span class="fu">mean</span>(sybp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_dbp =</span> <span class="fu">mean</span>(dibp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>()</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># stratified analysis by gender</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>stratified_summary <span class="ot">&lt;-</span> <span class="fu">stratified_analysis</span>(cleaned_data, <span class="st">"RIAGENDR"</span>, summarize_data)</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(stratified_summary, </span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Table 2: Summary of each variables stratified by gender"</span>, </span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_Na =</span> <span class="fu">mean</span>(DR1TSODI, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_K =</span> <span class="fu">mean</span>(DR1TPOTA, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_Mg =</span> <span class="fu">mean</span>(DR1TMAGN, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_Ca =</span> <span class="fu">mean</span>(DR1TCALC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_fiber =</span> <span class="fu">mean</span>(DR1TFIBE, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_sbp =</span> <span class="fu">mean</span>(sybp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_dbp =</span> <span class="fu">mean</span>(dibp, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># stratified analysis by gender</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>stratified_summary <span class="ot">&lt;-</span> <span class="fu">stratified_analysis</span>(cleaned_data, <span class="st">"RIAGENDR"</span>, summarize_data)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(stratified_summary, </span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="st">"Table 2: Summary of each variables stratified by gender"</span>, </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -556,7 +634,11 @@ Note
 <thead>
 <tr class="header">
 <th style="text-align: right;" data-quarto-table-cell-role="th">mean_age</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">mean_sodium</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_Na</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_K</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_Mg</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_Ca</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean_fiber</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">mean_sbp</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">mean_dbp</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">n</th>
@@ -565,19 +647,27 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">37.12323</td>
-<td style="text-align: right;">3336.134</td>
-<td style="text-align: right;">121.2114</td>
-<td style="text-align: right;">72.55017</td>
-<td style="text-align: right;">5575</td>
+<td style="text-align: right;">53.80247</td>
+<td style="text-align: right;">3553.442</td>
+<td style="text-align: right;">2806.880</td>
+<td style="text-align: right;">331.7343</td>
+<td style="text-align: right;">982.9995</td>
+<td style="text-align: right;">17.98099</td>
+<td style="text-align: right;">125.3489</td>
+<td style="text-align: right;">75.40653</td>
+<td style="text-align: right;">3488</td>
 <td style="text-align: left;">Male</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">39.36537</td>
-<td style="text-align: right;">2615.691</td>
-<td style="text-align: right;">117.2749</td>
-<td style="text-align: right;">71.91256</td>
-<td style="text-align: right;">6358</td>
+<td style="text-align: right;">53.48716</td>
+<td style="text-align: right;">2683.478</td>
+<td style="text-align: right;">2223.024</td>
+<td style="text-align: right;">264.3515</td>
+<td style="text-align: right;">801.6165</td>
+<td style="text-align: right;">14.84659</td>
+<td style="text-align: right;">120.9399</td>
+<td style="text-align: right;">74.18552</td>
+<td style="text-align: right;">4321</td>
 <td style="text-align: left;">Female</td>
 </tr>
 </tbody>
@@ -632,81 +722,85 @@ Note
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for modeling with condition-based formulas</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>model.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base formula</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  response <span class="ot">&lt;-</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) <span class="st">"BP_Binary"</span> <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) <span class="st">"BP_Category"</span> <span class="cf">else</span> response</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(response, <span class="st">"~"</span>, <span class="fu">paste</span>(variables, <span class="at">collapse =</span> <span class="st">" + "</span>)))</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"linear"</span>) {</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) {</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">family =</span> binomial)</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) {</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">polr</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Invalid model type."</span>)</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for summarizing results</span></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>summary.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, model_description) {</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(obj<span class="sc">$</span>model)) {</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"No model has been created yet."</span>)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>summaries[[model_description]] <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(<span class="fu">summary</span>(obj<span class="sc">$</span>model))</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend S3 to handle all seven models for a given response variable</span></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>run_models.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 1: Linear Model (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), </span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 2: Linear Model (Sodium Intake, Age, Gender, Race)"</span>),</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, </span>
-<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), </span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 3: Linear Model (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>),</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"logistic"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 4: Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>), </span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)"</span>),</span>
-<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>), </span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 6: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race)"</span>),</span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, </span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>), </span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 7: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)"</span>)</span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model <span class="cf">in</span> models) {</span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">model.BPAnalysis</span>(obj, <span class="at">type =</span> model<span class="sc">$</span>type, <span class="at">variables =</span> model<span class="sc">$</span>variables, <span class="at">response =</span> response)</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">summary.BPAnalysis</span>(obj, model<span class="sc">$</span>description)</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>  obj</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to output all summaries as HTML</span></span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>output_summaries <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">output_file =</span> <span class="st">"model_summaries.html"</span>) {</span>
-<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="st">"&lt;html&gt;&lt;head&gt;&lt;title&gt;Model Summaries&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Model Summaries&lt;/h1&gt;"</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>model.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">type =</span> <span class="st">"linear"</span>, </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>                             <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"DR1TFIBE"</span>, <span class="st">"DR1TPOTA"</span>, </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">"DR1TCALC"</span>, <span class="st">"DR1TMAGN"</span>), </span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                             <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base formula</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  response <span class="ot">&lt;-</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) <span class="st">"BP_Binary"</span> <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) <span class="st">"BP_Category"</span> <span class="cf">else</span> response</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(response, <span class="st">"~"</span>, <span class="fu">paste</span>(variables, <span class="at">collapse =</span> <span class="st">" + "</span>)))</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"linear"</span>) {</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"logistic"</span>) {</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> <span class="fu">glm</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">family =</span> binomial)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (type <span class="sc">==</span> <span class="st">"ordinal"</span>) {</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    obj<span class="sc">$</span>model <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">polr</span>(formula, <span class="at">data =</span> obj<span class="sc">$</span>data, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Invalid model type."</span>)</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># S3 method for summarizing results</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>summary.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, model_description) {</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(obj<span class="sc">$</span>model)) {</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"No model has been created yet."</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>  obj<span class="sc">$</span>summaries[[model_description]] <span class="ot">&lt;-</span> <span class="fu">capture.output</span>(<span class="fu">summary</span>(obj<span class="sc">$</span>model))</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend S3 to handle all seven models for a given response variable</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>run_models.BPAnalysis <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">response =</span> <span class="st">"sybp"</span>) {</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  dietary_intake <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"DR1TSODI"</span>, <span class="st">"DR1TFIBE"</span>, <span class="st">"DR1TPOTA"</span>, <span class="st">"DR1TCALC"</span>, <span class="st">"DR1TMAGN"</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake), </span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 1: Linear Model (5 Dietary Intake Nutrients and Blood Pressure)"</span>),</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"DMDEDUC2"</span>), </span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 2: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"</span>),</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"linear"</span>, </span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"DMDEDUC2"</span>, </span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>, <span class="st">"DR1TSODI"</span>), </span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 3: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)"</span>),</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"logistic"</span>, <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake), </span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 4: Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"</span>),</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake), </span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 5: Ordinal Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"</span>),</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"DMDEDUC2"</span>), </span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 6: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"</span>),</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">type =</span> <span class="st">"ordinal"</span>, </span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>         <span class="at">variables =</span> <span class="fu">c</span>(dietary_intake, <span class="st">"RIDAGEYR"</span>, <span class="st">"RIAGENDR"</span>, <span class="st">"RIDRETH3"</span>, <span class="st">"DMDEDUC2"</span>, </span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"BMXBMI"</span>, <span class="st">"LBXTC"</span>, <span class="st">"BPQ150"</span>, <span class="st">"DR1TKCAL"</span>, <span class="st">"DR1TSODI"</span>), </span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>         <span class="at">description =</span> <span class="st">"Model 7: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)"</span>)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model <span class="cf">in</span> models) {</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">model.BPAnalysis</span>(obj, <span class="at">type =</span> model<span class="sc">$</span>type, <span class="at">variables =</span> model<span class="sc">$</span>variables, <span class="at">response =</span> response)</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>    obj <span class="ot">&lt;-</span> <span class="fu">summary.BPAnalysis</span>(obj, model<span class="sc">$</span>description)</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>  obj</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model_name <span class="cf">in</span> <span class="fu">names</span>(obj<span class="sc">$</span>summaries)) {</span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>    html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>      html_content,</span>
-<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;h2&gt;"</span>, model_name, <span class="st">"&lt;/h2&gt;"</span>,</span>
-<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;pre&gt;"</span>, <span class="fu">paste</span>(obj<span class="sc">$</span>summaries[[model_name]], <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"&lt;/pre&gt;"</span></span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(html_content, <span class="st">"&lt;/body&gt;&lt;/html&gt;"</span>)</span>
-<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(html_content, output_file)</span>
-<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Summaries written to "</span>, output_file)</span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to output all summaries as HTML</span></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>output_summaries <span class="ot">&lt;-</span> <span class="cf">function</span>(obj, <span class="at">output_file =</span> <span class="st">"model_summaries.html"</span>) {</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="st">"&lt;html&gt;&lt;head&gt;&lt;title&gt;Model Summaries&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Model Summaries&lt;/h1&gt;"</span></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (model_name <span class="cf">in</span> <span class="fu">names</span>(obj<span class="sc">$</span>summaries)) {</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>      html_content,</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;h2&gt;"</span>, model_name, <span class="st">"&lt;/h2&gt;"</span>,</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>      <span class="st">"&lt;pre&gt;"</span>, <span class="fu">paste</span>(obj<span class="sc">$</span>summaries[[model_name]], <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">"&lt;/pre&gt;"</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>  html_content <span class="ot">&lt;-</span> <span class="fu">paste0</span>(html_content, <span class="st">"&lt;/body&gt;&lt;/html&gt;"</span>)</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(html_content, output_file)</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Summaries written to "</span>, output_file)</span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -753,17 +847,35 @@ Note
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> sybp, <span class="at">fill =</span> RIAGENDR)) <span class="sc">+</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#9edbf9"</span>, <span class="st">"#ef7135"</span>)) <span class="sc">+</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of Systolic Blood Pressure by Gender"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Count"</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Gender"</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # Visualization 1: Distribution of Systolic Blood Pressure (sybp) by Gender</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(cleaned_data, aes(x = sybp, fill = RIAGENDR)) +</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_histogram(binwidth = 5, position = "dodge", color = "black") +</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   scale_fill_manual(values = c("#9edbf9", "#ef7135")) +</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   labs(</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     title = "Distribution of Systolic Blood Pressure by Gender",</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     x = "Systolic Blood Pressure (mmHg)",</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     y = "Count",</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#     fill = "Gender"</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) +</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   theme_classic()</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization: Distribution of Systolic Blood Pressure by Education Status using Density Plot with Solid Lines</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> sybp, <span class="at">color =</span> DMDEDUC2)) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"solid"</span>) <span class="sc">+</span>  <span class="co"># Ensure all lines are solid</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Set3"</span>) <span class="sc">+</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Density Plot of Systolic Blood Pressure by Education Status"</span>,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Systolic Blood Pressure (mmHg)"</span>,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Education Level"</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.box =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -817,12 +929,12 @@ Note
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization 3: Relationship between Sodium Intake and Diastolic Blood Pressure (dibp)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> DR1TSODI, <span class="at">y =</span> dibp, <span class="at">color =</span> RIDRETH3)) <span class="sc">+</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cleaned_data, <span class="fu">aes</span>(<span class="at">x =</span> DR1TPOTA, <span class="at">y =</span> dibp, <span class="at">color =</span> RIDRETH3)) <span class="sc">+</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#009E73"</span>, <span class="st">"#F0E442"</span>, <span class="st">"#0072B2"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#CC79A7"</span>)) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#E69F00"</span>, <span class="st">"#009E73"</span>, <span class="st">"#56B4E9"</span>, <span class="st">"#0072B2"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#CC79A7"</span>)) <span class="sc">+</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Relationship between Sodium Intake and Diastolic Blood Pressure by Race"</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Sodium Intake (mg)"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Potassium Intake (mg)"</span>,</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Diastolic Blood Pressure (mmHg)"</span>,</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Race"</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
