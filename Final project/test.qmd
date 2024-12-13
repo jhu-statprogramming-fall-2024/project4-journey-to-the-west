@@ -1,0 +1,132 @@
+---
+title: "Enhanced Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# Load required libraries and data
+library(shiny)
+library(flexdashboard)
+library(here)
+load(here("data.RData"))
+```
+
+## Column {.sidebar width="30%"}
+
+Data from NHANES(2021-2023)
+
+```{r}
+textInput("name", "What is the title of the graph?", "Distribution of Variables")
+selectInput("variable", label = "Select a variable:",
+            choices = c("Please select",
+                        "Sodium Intake", "Potassium Intake", "Calcium Intake",
+                        "Systolic Blood Pressure", "Diastolic Blood Pressure", 
+                        "BMI", "Age"), selected = "Please select")
+selectInput("plot_type", label = "Select plot type:",
+            choices = c("Histogram", "Boxplot", "Scatterplot"), selected = "Histogram")
+selectInput("n_breaks", label = "Number of bins (for histograms):",
+            choices = c(10, 20, 30), selected = 20)
+checkboxInput("density", "Show density curve (for histograms)", FALSE)
+sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+            min = 0.2, max = 4, value = 2, step = 0.4)
+selectInput("color", label = "Select color:", 
+            choices = c("Blue", "Pink", "Green", "Purple", "Yellow"), selected = "Green")
+```
+
+## Column {width="50%"}
+
+### Dynamic Plot
+
+```{r}
+renderPlot({
+  plot_color <- switch(input$color, "Blue" = "#33b0ff", "Yellow" = "#f7e284", "Green" = "#9ed450", "Purple" = "#b39ddb", "Pink" = "#ffb6c1")
+  
+  if (input$variable == "Please select") {
+    plot.new()
+    text(0.5, 0.5, "Please select a variable and plot type.", cex = 1.5)
+  } else {
+    var <- switch(input$variable,
+                  "Sodium Intake" = data$DR1TSODI,
+                  "Potassium Intake" = data$DR1TKCAL,
+                  "Calcium Intake" = data$DR1TCA,
+                  "Systolic Blood Pressure" = data$sybp,
+                  "Diastolic Blood Pressure" = data$dibp,
+                  "BMI" = data$BMXBMI,
+                  "Age" = data$RIDAGEYR)
+    if (input$plot_type == "Histogram") {
+      hist(var, probability = TRUE, breaks = as.numeric(input$n_breaks),
+           xlab = input$variable, main = input$name, col = plot_color)
+      if (input$density) {
+        dens <- density(var, adjust = input$bw_adjust)
+        lines(dens, col = "red")
+      }
+    } else if (input$plot_type == "Boxplot") {
+      boxplot(var ~ data$RIAGENDR, main = paste("Boxplot of", input$variable),
+              xlab = "Gender", ylab = input$variable, col = plot_color)
+    } else if (input$plot_type == "Scatterplot") {
+      scatter_var <- switch(input$variable,
+                            "Sodium Intake" = data$DR1TSODI,
+                            "Potassium Intake" = data$DR1TKCAL)
+      plot(scatter_var, data$sybp, col = plot_color, pch = 19,
+           xlab = input$variable, ylab = "Systolic Blood Pressure",
+           main = paste("Scatterplot:", input$variable, "vs Systolic BP"))
+    }
+  }
+})
+```
+
+## Column {width="20%"}
+
+#### Summary Statistics
+
+```{r}
+renderPrint({
+  if (input$variable != "Please select") {
+    var <- switch(input$variable,
+                  "Sodium Intake" = data$DR1TSODI,
+                  "Potassium Intake" = data$DR1TKCAL,
+                  "Calcium Intake" = data$DR1TCA,
+                  "Systolic Blood Pressure" = data$sybp,
+                  "Diastolic Blood Pressure" = data$dibp,
+                  "BMI" = data$BMXBMI,
+                  "Age" = data$RIDAGEYR)
+    summary(var)
+  } else {
+    "Please select a variable to view summary statistics."
+  }
+})
+```
+
+#### Download Plot
+
+```{r}
+downloadHandler(
+  filename = function() {
+    paste("plot_", Sys.Date(), ".png", sep = "")
+  },
+  content = function(file) {
+    png(file)
+    plot_color <- switch(input$color, "Blue" = "#33b0ff", "Yellow" = "#f7e284", "Green" = "#9ed450", "Purple" = "#b39ddb", "Pink" = "#ffb6c1")
+    var <- switch(input$variable,
+                  "Sodium Intake" = data$DR1TSODI,
+                  "Potassium Intake" = data$DR1TKCAL,
+                  "Calcium Intake" = data$DR1TCA,
+                  "Systolic Blood Pressure" = data$sybp,
+                  "Diastolic Blood Pressure" = data$dibp,
+                  "BMI" = data$BMXBMI,
+                  "Age" = data$RIDAGEYR)
+    if (input$plot_type == "Histogram") {
+      hist(var, probability = TRUE, breaks = as.numeric(input$n_breaks),
+           xlab = input$variable, main = input$name, col = plot_color)
+      if (input$density) {
+        dens <- density(var, adjust = input$bw_adjust)
+        lines(dens, col = "red")
+      }
+    }
+    dev.off()
+  }
+)
+```
