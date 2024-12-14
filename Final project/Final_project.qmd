@@ -24,7 +24,7 @@ In this section, data *downloading, processing,* and some *initial analysis* wer
 :::
 
 ```{r load required packages, warning=FALSE, include=FALSE}
-packages <- c("tidyverse", "haven", "table1", "purrr", "MASS")
+packages <- c("tidyverse", "haven", "table1", "purrr", "MASS", "randomForest", "doParallel", "mice")
 for (pkg in packages) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg)
@@ -184,12 +184,40 @@ cleaned_data <- set_labels_and_units(cleaned_data, labels, units)
 
 # Generate Table 1
 create_table1(cleaned_data)
-
-# Save cleaned data
-readr::write_csv(cleaned_data, "data/NHANES_cleaned_data.csv")
 ```
 
-### 1.3 Robust Anlysis
+### 1.3 Multiple Imputation for the Missing values by Random Forest
+
+```{r Multiple Imputation}
+imputed_data_file <- "data/NHANES_imputed_data.csv"
+if (file.exists(imputed_data_file)) {
+  message("Imputed dataset exists. Loading from file.")
+  cleaned_data_imputed <- read.csv(imputed_data_file)
+} else {
+  # Perform multiple imputation
+  set.seed(123)
+  imputed_data <- mice(
+    cleaned_data, 
+    m = 10, # Number of multiple imputations
+    method = "pmm", # Predictive Mean Matching
+    maxit = 50, # Maximum number of iterations
+    seed = 123
+  )
+
+  # Check the imputed data summary
+  summary(imputed_data)
+
+  # Complete the dataset by pooling results from imputations
+  cleaned_data_imputed <- complete(imputed_data)
+
+  # Save the imputed dataset
+  write.csv(cleaned_data_imputed, imputed_data_file, row.names = FALSE)
+  message("Imputed dataset created and saved.")
+}
+```
+
+
+### 1.4 Robust Anlysis
 A stratified Analysis by gender was conducted. 
 
 ```{r stratified analysis}
@@ -227,7 +255,7 @@ summarize_data <- function(data) {
 }
 
 # stratified analysis by gender
-stratified_summary <- stratified_analysis(cleaned_data, "RIAGENDR", summarize_data)
+stratified_summary <- stratified_analysis(cleaned_data_imputed, "RIAGENDR", summarize_data)
 knitr::kable(stratified_summary, 
       caption = "Table 2: Summary of each variables stratified by gender", 
       format = "html")
@@ -360,7 +388,7 @@ output_summaries <- function(obj, output_file = "model_summaries.html") {
 
 ```{r S3 sybp, warning=FALSE}
 # Run SYBP analysis
-sybp_obj <- BPAnalysis(cleaned_data)
+sybp_obj <- BPAnalysis(cleaned_data_imputed)
 sybp_obj <- sybp.BPAnalysis(sybp_obj)
 sybp_obj <- run_models.BPAnalysis(sybp_obj, response = "sybp")
 output_summaries(sybp_obj, output_file = "sybp_model_summaries.html")
@@ -371,7 +399,7 @@ output_summaries(sybp_obj, output_file = "sybp_model_summaries.html")
 
 ```{r S3 dibp, warning=FALSE}
 # Run DIBP analysis
-dibp_obj <- BPAnalysis(cleaned_data)
+dibp_obj <- BPAnalysis(cleaned_data_imputed)
 dibp_obj <- dibp.BPAnalysis(dibp_obj)
 dibp_obj <- run_models.BPAnalysis(dibp_obj, response = "dibp")
 output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
@@ -384,7 +412,7 @@ output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
 Using `geom_histogram`
 ```{r visualization 1, warning=FALSE}
 # # Visualization 1: Distribution of Systolic Blood Pressure by Education Status using Density Plot
-ggplot(cleaned_data, aes(x = sybp, color = DMDEDUC2)) +
+ggplot(cleaned_data_imputed, aes(x = sybp, color = DMDEDUC2)) +
   geom_density(size = 1, linetype = "solid") +  # Ensure all lines are solid
   scale_color_brewer(palette = "Set3") +
   labs(
@@ -406,12 +434,12 @@ ggplot(cleaned_data, aes(x = sybp, color = DMDEDUC2)) +
 Using `geom_boxplot` to create box plot and `geom_text` to label
 
 ```{r visualization 2, warning=FALSE}
-medians <- cleaned_data %>%
+medians <- cleaned_data_imputed %>%
   group_by(RIAGENDR) %>%
   summarize(median_sodium = median(DR1TSODI, na.rm = TRUE))
 
 # Visualization 2: Boxplot of Sodium Intake (DR1TSODI) by Gender
-ggplot(cleaned_data, aes(x = RIAGENDR, y = DR1TSODI, fill = RIAGENDR)) +
+ggplot(cleaned_data_imputed, aes(x = RIAGENDR, y = DR1TSODI, fill = RIAGENDR)) +
   geom_boxplot() +
   scale_fill_manual(values = c("#94f0ff", "#ffa394")) +
   labs(
@@ -433,7 +461,7 @@ Using `geom_point` to create scatter plot
 
 ```{r visualization 3, warning=FALSE}
 # Visualization 3: Relationship between Sodium Intake and Diastolic Blood Pressure (dibp)
-ggplot(cleaned_data, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
+ggplot(cleaned_data_imputed, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
   geom_point(alpha = 0.7) +
   scale_color_manual(values = c("#E69F00", "#009E73", "#56B4E9", "#0072B2", "#D55E00", "#CC79A7")) +
   labs(
@@ -445,5 +473,60 @@ ggplot(cleaned_data, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
   theme_classic()
 ```
 
+## 4. Machine Learning: Random Forest to Predict Blood Pressure
 
+### 4.1 Model Implementation with Random Forest
+
+```{r machine learning}
+# Parallel processing setup
+cores <- detectCores() - 1 # Reserve 1 core for system processes
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
+# Prepare the dataset
+# Using demographic and dietary variables to predict blood pressure (sybp and dibp)
+features <- cleaned_data_imputed %>% 
+  dplyr::select(
+    -c(SEQN, sybp, dibp) # Remove unique ID and target variables
+  )
+target <- cleaned_data_imputed %>% 
+  dplyr::select(sybp, dibp)
+
+# Combine features and targets for model training
+data_for_model <- cbind(features, target)
+data_for_model <- na.omit(data_for_model) # Remove rows with NA values
+
+# Split data into training and testing sets
+set.seed(123)
+train_index <- createDataPartition(data_for_model$sybp, p = 0.8, list = FALSE)
+train_data <- data_for_model[train_index, ]
+test_data <- data_for_model[-train_index, ]
+
+# Train Random Forest model
+rf_model <- randomForest(
+  sybp ~ ., # Predict systolic blood pressure
+  data = train_data,
+  ntree = 250,
+  importance = TRUE,
+  proximity = TRUE
+)
+
+# Stop parallel processing
+stopCluster(cl)
+
+# Evaluate the model
+predicted_values <- predict(rf_model, test_data)
+actual_values <- test_data$sybp
+
+# Calculate performance metrics
+performance <- data.frame(
+  RMSE = sqrt(mean((predicted_values - actual_values)^2)),
+  R2 = cor(predicted_values, actual_values)^2
+)
+print(performance)
+
+# Variable importance
+importance <- importance(rf_model)
+varImpPlot(rf_model)
+```
 
