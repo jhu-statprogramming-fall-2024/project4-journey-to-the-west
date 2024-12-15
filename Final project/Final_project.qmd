@@ -24,7 +24,8 @@ In this section, data *downloading, processing,* and some *initial analysis* wer
 :::
 
 ```{r load required packages, warning=FALSE, include=FALSE}
-packages <- c("tidyverse", "haven", "table1", "purrr", "MASS", "randomForest", "doParallel", "mice")
+packages <- c("tidyverse", "haven", "table1", "purrr", "MASS", "caret", 
+              "randomForest", "doParallel", "mice")
 for (pkg in packages) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg)
@@ -478,18 +479,20 @@ ggplot(cleaned_data_imputed, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
 ### 4.1 Model Implementation with Random Forest
 
 ```{r machine learning}
+
+
 # Parallel processing setup
 cores <- detectCores() - 1 # Reserve 1 core for system processes
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # Prepare the dataset
-# Using demographic and dietary variables to predict blood pressure (sybp and dibp)
-features <- cleaned_data_imputed %>% 
+# Exclude variables that are direct measures or redundant
+features <- cleaned_data_imputed %>%
   dplyr::select(
-    -c(SEQN, sybp, dibp) # Remove unique ID and target variables
+    -c(SEQN, sybp, dibp, BPXOSY1, BPXOSY2, BPXOSY3, BPXODI1, BPXODI2, BPXODI3)
   )
-target <- cleaned_data_imputed %>% 
+target <- cleaned_data_imputed %>%
   dplyr::select(sybp, dibp)
 
 # Combine features and targets for model training
@@ -502,31 +505,55 @@ train_index <- createDataPartition(data_for_model$sybp, p = 0.8, list = FALSE)
 train_data <- data_for_model[train_index, ]
 test_data <- data_for_model[-train_index, ]
 
-# Train Random Forest model
-rf_model <- randomForest(
+# Train Random Forest model for sybp
+set.seed(123)
+rf_model_sybp <- randomForest(
   sybp ~ ., # Predict systolic blood pressure
   data = train_data,
-  ntree = 250,
-  importance = TRUE,
-  proximity = TRUE
+  ntree = 500,
+  importance = TRUE
+)
+
+# Train Random Forest model for dibp
+set.seed(123)
+rf_model_dibp <- randomForest(
+  dibp ~ ., # Predict diastolic blood pressure
+  data = train_data,
+  ntree = 500,
+  importance = TRUE
 )
 
 # Stop parallel processing
 stopCluster(cl)
 
-# Evaluate the model
-predicted_values <- predict(rf_model, test_data)
-actual_values <- test_data$sybp
+# Predictions for sybp
+predicted_sybp <- predict(rf_model_sybp, test_data)
+actual_sybp <- test_data$sybp
+
+# Predictions for dibp
+predicted_dibp <- predict(rf_model_dibp, test_data)
+actual_dibp <- test_data$dibp
 
 # Calculate performance metrics
 performance <- data.frame(
-  RMSE = sqrt(mean((predicted_values - actual_values)^2)),
-  R2 = cor(predicted_values, actual_values)^2
+  Metric = c("RMSE", "R2"),
+  SYBP = c(
+    sqrt(mean((predicted_sybp - actual_sybp)^2)),
+    cor(predicted_sybp, actual_sybp)^2
+  ),
+  DIBP = c(
+    sqrt(mean((predicted_dibp - actual_dibp)^2)),
+    cor(predicted_dibp, actual_dibp)^2
+  )
 )
+print("Performance Metrics for SYBP and DIBP:")
 print(performance)
 
-# Variable importance
-importance <- importance(rf_model)
-varImpPlot(rf_model)
+# Variable importance plots for both models
+par(mfrow = c(1, 2)) # Arrange plots side-by-side
+varImpPlot(rf_model_sybp, main = "Variable Importance for SYBP")
+varImpPlot(rf_model_dibp, main = "Variable Importance for DIBP")
+par(mfrow = c(1, 1)) # Reset plotting layout
+
 ```
 
