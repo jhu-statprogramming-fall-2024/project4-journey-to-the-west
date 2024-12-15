@@ -218,7 +218,7 @@ if (file.exists(imputed_data_file)) {
 ```
 
 
-### 1.4 Robust Anlysis
+### 1.4 Initial Anlysis
 A stratified Analysis by gender was conducted. 
 
 ```{r stratified analysis}
@@ -412,23 +412,23 @@ output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
 ### 3.1 Distribution of Systolic Blood Pressure stratified by Gender
 Using `geom_histogram`
 ```{r visualization 1, warning=FALSE}
-# # Visualization 1: Distribution of Systolic Blood Pressure by Education Status using Density Plot
-ggplot(cleaned_data_imputed, aes(x = sybp, color = DMDEDUC2)) +
-  geom_density(size = 1, linetype = "solid") +  # Ensure all lines are solid
-  scale_color_brewer(palette = "Set3") +
+# Violin Plot of Systolic Blood Pressure by Education Level
+ggplot(cleaned_data_imputed, aes(x = DMDEDUC2, y = sybp, fill = DMDEDUC2)) +
+  geom_violin(trim = FALSE) +  # Add violin plot without trimming
+  scale_fill_brewer(palette = "Set3") +
   labs(
-    title = "Density Plot of Systolic Blood Pressure by Education Status",
-    x = "Systolic Blood Pressure (mmHg)",
-    y = "Density",
-    color = "Education Level"
+    title = "Violin Plot of Systolic Blood Pressure by Education Status",
+    x = "Education Level",
+    y = "Systolic Blood Pressure (mmHg)",
+    fill = "Education Levels"
   ) +
   theme_classic() +
-  theme(legend.position = "right",
-        legend.box = "horizontal",
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 8),
-        plot.title = element_text(size = 14, face = "bold"),
-        axis.title = element_text(size = 12))
+  theme(
+    legend.position = "right",
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_blank()
+  )
 ```
 
 ### 3.2 Distribution of Sodium Intake stratified by Gender
@@ -478,8 +478,30 @@ ggplot(cleaned_data_imputed, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
 
 ### 4.1 Model Implementation with Random Forest
 
-```{r machine learning}
-
+```{r machine learning, warning=FALSE}
+# Create simplified blood pressure category in cleaned_data_imputed
+cleaned_data_imputed <- cleaned_data_imputed %>%
+  # Create BP_Category for sybp
+  mutate(
+    BP_Category_SYBP = factor(case_when(
+      sybp <= 130 ~ "Normal",
+      sybp > 130 ~ "High"
+    ), levels = c("Normal", "High")),
+    
+    # Create BP_Category for dibp
+    BP_Category_DIBP = factor(case_when(
+      dibp <= 80 ~ "Normal",
+      dibp > 80 ~ "High"
+    ), levels = c("Normal", "High")),
+    
+    # Combine into a single BP_Category
+    BP_Category = case_when(
+      BP_Category_SYBP == "High" | BP_Category_DIBP == "High" ~ "High",
+      TRUE ~ "Normal" # Default fallback
+    )
+  ) %>%
+  # Convert to factor for training
+  mutate(BP_Category = factor(BP_Category, levels = c("Normal", "High")))
 
 # Parallel processing setup
 cores <- detectCores() - 1 # Reserve 1 core for system processes
@@ -487,73 +509,112 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # Prepare the dataset
-# Exclude variables that are direct measures or redundant
-features <- cleaned_data_imputed %>%
-  dplyr::select(
-    -c(SEQN, sybp, dibp, BPXOSY1, BPXOSY2, BPXOSY3, BPXODI1, BPXODI2, BPXODI3)
-  )
-target <- cleaned_data_imputed %>%
-  dplyr::select(sybp, dibp)
 
-# Combine features and targets for model training
-data_for_model <- cbind(features, target)
-data_for_model <- na.omit(data_for_model) # Remove rows with NA values
+features <- cleaned_data_imputed %>% 
+  dplyr::select(
+    c(RIDAGEYR, RIAGENDR, RIDRETH3, DMDEDUC2, DR1TSODI, DR1TFIBE, DR1TPOTA, 
+      DR1TCALC, DR1TMAGN, DR1TKCAL, BMXBMI, LBXTC, BPQ150) 
+  )
+
+target_sybp <- cleaned_data_imputed$BP_Category_SYBP  # Target for systolic blood pressure
+target_dibp <- cleaned_data_imputed$BP_Category_DIBP  # Target for diastolic blood pressure
+target_bp <- cleaned_data_imputed$BP_Category
+
+# Combine features and targets into separate datasets for training
+data_for_model_sybp <- cbind(features, sybp = target_sybp)
+data_for_model_dibp <- cbind(features, dibp = target_dibp)
+data_for_model_bp <- cbind(features, bp = target_bp)
 
 # Split data into training and testing sets
-set.seed(123)
-train_index <- createDataPartition(data_for_model$sybp, p = 0.8, list = FALSE)
-train_data <- data_for_model[train_index, ]
-test_data <- data_for_model[-train_index, ]
+set.seed(20241217)
+train_index_sybp <- createDataPartition(data_for_model_sybp$sybp, p = 0.8, list = FALSE)
+train_data_sybp <- data_for_model_sybp[train_index_sybp, ]
+test_data_sybp <- data_for_model_sybp[-train_index_sybp, ]
 
-# Train Random Forest model for sybp
-set.seed(123)
+train_index_dibp <- createDataPartition(data_for_model_dibp$dibp, p = 0.8, list = FALSE)
+train_data_dibp <- data_for_model_dibp[train_index_dibp, ]
+test_data_dibp <- data_for_model_dibp[-train_index_dibp, ]
+
+train_index_bp <- createDataPartition(data_for_model_bp$bp, p = 0.8, list = FALSE)
+train_data_bp <- data_for_model_bp[train_index_bp, ]
+test_data_bp <- data_for_model_bp[-train_index_bp, ]
+
+# Train Random Forest model for SYBP
+set.seed(20241217)
 rf_model_sybp <- randomForest(
   sybp ~ ., # Predict systolic blood pressure
-  data = train_data,
-  ntree = 500,
+  data = train_data_sybp,
+  ntree = 250,
   importance = TRUE
 )
 
-# Train Random Forest model for dibp
-set.seed(123)
+# Train Random Forest model for DIBP
+set.seed(20241217)
 rf_model_dibp <- randomForest(
   dibp ~ ., # Predict diastolic blood pressure
-  data = train_data,
-  ntree = 500,
+  data = train_data_dibp,
+  ntree = 250,
+  importance = TRUE
+)
+
+set.seed(20241217)
+rf_model_bp <- randomForest(
+  bp ~ ., # Predict diastolic blood pressure
+  data = train_data_bp,
+  ntree = 250,
   importance = TRUE
 )
 
 # Stop parallel processing
 stopCluster(cl)
-
-# Predictions for sybp
-predicted_sybp <- predict(rf_model_sybp, test_data)
-actual_sybp <- test_data$sybp
-
-# Predictions for dibp
-predicted_dibp <- predict(rf_model_dibp, test_data)
-actual_dibp <- test_data$dibp
-
-# Calculate performance metrics
-performance <- data.frame(
-  Metric = c("RMSE", "R2"),
-  SYBP = c(
-    sqrt(mean((predicted_sybp - actual_sybp)^2)),
-    cor(predicted_sybp, actual_sybp)^2
-  ),
-  DIBP = c(
-    sqrt(mean((predicted_dibp - actual_dibp)^2)),
-    cor(predicted_dibp, actual_dibp)^2
-  )
-)
-print("Performance Metrics for SYBP and DIBP:")
-print(performance)
-
-# Variable importance plots for both models
-par(mfrow = c(1, 2)) # Arrange plots side-by-side
-varImpPlot(rf_model_sybp, main = "Variable Importance for SYBP")
-varImpPlot(rf_model_dibp, main = "Variable Importance for DIBP")
-par(mfrow = c(1, 1)) # Reset plotting layout
-
 ```
+
+### 4.2 Systolic Blood Pressure Prediction Performance
+
+```{r Systolic Blood Pressure Prediction Performance, warning=FALSE}
+# Make predictions on the test data
+predicted_sybp <- predict(rf_model_sybp, test_data_sybp)
+actual_sybp <- test_data_sybp$sybp
+
+# Evaluate model performance
+confusion_matrix_sybp <- caret::confusionMatrix(predicted_sybp, actual_sybp)
+print(confusion_matrix_sybp)
+
+# Variable importance
+importance <- importance(rf_model_sybp)
+varImpPlot(rf_model_sybp)
+```
+
+### 4.3 Diastolic Blood Pressure Prediction Performance
+
+```{r Diastolic Blood Pressure Prediction Performance, warning=FALSE}
+# Make predictions on the test data
+predicted_dibp <- predict(rf_model_dibp, test_data_dibp)
+actual_dibp <- test_data_dibp$dibp
+
+# Evaluate model performance
+confusion_matrix_dibp <- caret::confusionMatrix(predicted_dibp, actual_dibp)
+print(confusion_matrix_dibp)
+
+# Variable importance
+importance <- importance(rf_model_dibp)
+varImpPlot(rf_model_dibp)
+```
+
+### 4.4 hypertension Prediction Performance
+
+```{r hypertension Prediction Performance}
+# Make predictions on the test data
+predicted_bp <- predict(rf_model_bp, test_data_bp)
+actual_bp <- test_data_bp$bp
+
+# Evaluate model performance
+confusion_matrix_bp <- caret::confusionMatrix(predicted_bp, actual_bp)
+print(confusion_matrix_bp)
+
+# Variable importance
+importance <- importance(rf_model_bp)
+varImpPlot(rf_model_bp)
+```
+
 
