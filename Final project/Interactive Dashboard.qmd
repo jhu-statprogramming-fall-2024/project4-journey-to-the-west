@@ -1,0 +1,221 @@
+---
+title: "Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+runtime: shiny
+---
+```{r setup, include=FALSE}
+# Load required libraries and data
+library(shiny)
+library(flexdashboard)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+data <- read.csv("data/NHANES_imputed_data.csv")
+```
+
+## Column 1 {.sidebar width="30%"}
+
+Data from NHANES(2021-2023)
+
+```{r}
+textInput("name", "What is the title of the graph?", "Distribution of Variables")
+selectInput("variable", label = "Select a variable:",
+            choices = c("Please select",
+                        "Sodium Intake", "Potassium Intake", "Calcium Intake", "Magnesium Intake", 
+                        "Fiber Intake", "Systolic Blood Pressure", "Diastolic Blood Pressure", 
+                        "BMI", "Age"), selected = "Please select")
+selectInput("stratify", label = "Stratify by:",
+            choices = c("None", "Gender", "Race/Ethnicity", "Education Level"), selected = "None")
+selectInput("plot_type", label = "Select plot type:",
+            choices = c("Histogram", "Boxplot", "Scatterplot"), selected = "Histogram")
+selectInput("n_breaks", label = "Number of bins (for histograms):",
+            choices = c(10, 20, 30), selected = 20)
+checkboxInput("density", "Show density curve (for histograms)", FALSE)
+sliderInput("bw_adjust", label = "Bandwidth adjustment:",
+            min = 0.2, max = 4, value = 2, step = 0.4)
+```
+
+#### Download Plot
+
+```{r}
+#### Download Plot
+
+downloadHandler(
+  filename = function() {
+    paste("plot_", Sys.Date(), ".png", sep = "")
+  },
+  content = function(file) {
+    ggsave(file, plot = last_plot(), width = 16, height = 12)
+  }
+)
+```
+
+## Column 3
+#### Summary Statistics
+
+```{r}
+renderPrint({
+  if (input$variable != "Please select") {
+    var <- switch(input$variable,
+                  "Sodium Intake" = data$DR1TSODI,
+                  "Potassium Intake" = data$DR1TPOTA,
+                  "Calcium Intake" = data$DR1TCALC,
+                  "Magnesium Intake" = data$DR1TMAGN,
+                  "Fiber Intake" = data$DR1TFIBE,
+                  "Systolic Blood Pressure" = data$sybp,
+                  "Diastolic Blood Pressure" = data$dibp,
+                  "BMI" = data$BMXBMI,
+                  "Age" = data$RIDAGEYR)
+    
+    strat_var <- switch(input$stratify,
+                        "Gender" = data$RIAGENDR,
+                        "Race/Ethnicity" = data$RIDRETH3,
+                        "Education Level" = data$DMDEDUC2,
+                        "None" = NULL)
+    
+    if (input$stratify == "None") {
+      # Summary for the entire dataset
+      cat("Summary Statistics for All Data:\n")
+      print(summary(var))
+    } else {
+      # Grouped summary
+      grouped_data <- data.frame(var, strat_var)
+      grouped_summary <- grouped_data %>%
+        group_by(strat_var) %>%
+        summarize(
+          Min = min(var, na.rm = TRUE),
+          Q1 = quantile(var, 0.25, na.rm = TRUE),
+          Median = median(var, na.rm = TRUE),
+          Mean = mean(var, na.rm = TRUE),
+          Q3 = quantile(var, 0.75, na.rm = TRUE),
+          Max = max(var, na.rm = TRUE)
+        )
+      
+      cat("Summary Statistics by", input$stratify, ":\n")
+      knitr::kable(grouped_summary, format = "simple")
+    }
+  } else {
+    cat("Please select a variable to view summary statistics.")
+  }
+})
+```
+
+### Dynamic Plot 
+
+```{r}
+# Store the last rendered plot in a reactive variable
+last_plot <- reactiveVal()
+
+### Dynamic Plot
+renderPlot({
+  if (input$variable == "Please select") {
+    p <- ggplot() +
+      annotate("text", x = 0.5, y = 0.5, label = "Please select a variable and plot type.", size = 6) +
+      theme_void()
+  } else {
+    var <- switch(input$variable,
+                  "Sodium Intake" = data$DR1TSODI,
+                  "Potassium Intake" = data$DR1TPOTA,
+                  "Calcium Intake" = data$DR1TCALC,
+                  "Magnesium Intake" = data$DR1TMAGN,
+                  "Fiber Intake" = data$DR1TFIBE,
+                  "Systolic Blood Pressure" = data$sybp,
+                  "Diastolic Blood Pressure" = data$dibp,
+                  "BMI" = data$BMXBMI,
+                  "Age" = data$RIDAGEYR)
+    
+    strat_var <- switch(input$stratify,
+                        "Gender" = data$RIAGENDR,
+                        "Race/Ethnicity" = data$RIDRETH3,
+                        "Education Level" = data$DMDEDUC2,
+                        "None" = NULL)
+
+    if (input$plot_type == "Histogram") {
+      p <- ggplot(data, aes(x = var)) +
+        geom_histogram(aes(y = ..density.., fill = if (input$stratify == "None") NULL else as.factor(strat_var)), 
+                       bins = as.numeric(input$n_breaks), color = "black", alpha = 0.7, position = "stack") +
+        labs(title = input$name, x = input$variable, y = "Density", fill = input$stratify) +
+        theme_bw()+
+        theme(
+          text = element_text(size = 14),            
+          plot.title = element_text(size = 18),      
+          axis.title = element_text(size = 16),      
+          axis.text = element_text(size = 12),       
+          legend.text = element_text(size = 12),     
+          strip.text = element_text(size = 14)       
+        )
+    
+        
+      if (input$density) {
+        p <- p + geom_density(aes(y = ..density..), color = "red", size = 1, adjust = input$bw_adjust, alpha = 0.7)
+      }
+      
+      if (input$stratify == "Gender") {
+        p <- p + facet_wrap(~RIAGENDR, scales = "free_y")
+      } else if (input$stratify == "Race/Ethnicity") {
+        p <- p + facet_wrap(~RIDRETH3, scales = "free_y")
+      } else if (input$stratify == "Education Level") {
+        p <- p + facet_wrap(~DMDEDUC2, scales = "free_y")
+      }
+    } else if (input$plot_type == "Boxplot") {
+      p <- ggplot(data, aes(x = if (input$stratify == "None") "" else as.factor(strat_var), 
+                            y = var, fill = if (input$stratify == "None") NULL else as.factor(strat_var))) +
+        geom_boxplot(color = "black", alpha = 0.7) +
+        labs(title = paste("Boxplot of", input$variable, 
+                           if (input$stratify != "None") paste("Stratified by", input$stratify) else ""),
+             x = if (input$stratify == "None") "" else input$stratify, 
+             y = input$variable, fill = input$stratify) +
+        theme_bw() +
+        theme(
+          text = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.title = element_text(size = 16),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          strip.text = element_text(size = 14)
+        )
+     
+       
+      if (input$stratify == "Gender") {
+        p <- p + facet_wrap(~RIAGENDR, scales = "free")
+      } else if (input$stratify == "Race/Ethnicity") {
+        p <- p + facet_wrap(~RIDRETH3, scales = "free")
+      } else if (input$stratify == "Education Level") {
+        p <- p + facet_wrap(~DMDEDUC2, scales = "free")
+      }
+    } else if (input$plot_type == "Scatterplot") {
+      p <- ggplot(data, aes(x = var, y = sybp, 
+                            color = if (input$stratify == "None") NULL else as.factor(strat_var))) +
+        geom_point(alpha = 0.7) +
+        labs(title = paste("Scatterplot of", input$variable, "vs Systolic BP", 
+                           if (input$stratify != "None") paste("Stratified by", input$stratify) else ""),
+             x = input$variable, y = "Systolic Blood Pressure", color = input$stratify) +
+        theme_bw()  +
+        theme(
+          text = element_text(size = 14),
+          plot.title = element_text(size = 18),
+          axis.title = element_text(size = 16),
+          axis.text = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          strip.text = element_text(size = 14)
+        )
+      
+      if (input$stratify == "Gender") {
+        p <- p + facet_wrap(~RIAGENDR, scales = "free")
+      } else if (input$stratify == "Race/Ethnicity") {
+        p <- p + facet_wrap(~RIDRETH3, scales = "free")
+      } else if (input$stratify == "Education Level") {
+        p <- p + facet_wrap(~DMDEDUC2, scales = "free")
+      }
+    }
+  }
+  
+  last_plot(p) # Save the plot for downloading
+  print(p)
+})
+```
+
+
+
