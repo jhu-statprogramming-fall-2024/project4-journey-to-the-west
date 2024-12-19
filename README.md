@@ -28,8 +28,8 @@ install.packages(c("tidyverse", "labelled", "tableone", "shiny", "quarto"))
 ## Authors
 - **Yishan Lin**: ylin183@jh.edu, JHED ID: ylin183
 - **Yimin Ding**: yding75@jh.edu, JHED ID: yding75
-- **Yingqi Wang**: ywang54@jh.edu, JHED ID: ywang54
-- **Ruiqing Cai**: rcai43@jh.edu, JHED ID: rcai43
+- **Yingqi Wang**: ywang911@jh.edu, JHED ID: ywang911
+- **Ruiqing Cai**: rcai9@jh.edu, JHED ID: rcai9
 
 ## Files
 - `project4_analysis.qmd`: Quarto Markdown file containing the analysis code.
