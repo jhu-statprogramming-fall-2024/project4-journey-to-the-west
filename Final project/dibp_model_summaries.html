@@ -1,0 +1,232 @@
+<html><head><title>Model Summaries</title></head><body><h1>Model Summaries</h1><h2>Model 1: Linear Model (5 Dietary Intake Nutrients and Blood Pressure)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-37.774  -7.487  -0.618   6.711  63.522 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  7.570e+01  2.971e-01 254.815  < 2e-16 ***
+DR1TSODI     1.864e-04  9.932e-05   1.877   0.0606 .  
+DR1TFIBE    -2.731e-02  1.887e-02  -1.447   0.1479    
+DR1TPOTA     5.365e-04  1.807e-04   2.969   0.0030 ** 
+DR1TCALC    -1.639e-03  2.912e-04  -5.629 1.88e-08 ***
+DR1TMAGN    -3.392e-03  1.466e-03  -2.313   0.0207 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 10.97 on 7803 degrees of freedom
+Multiple R-squared:  0.007928,	Adjusted R-squared:  0.007293 
+F-statistic: 12.47 on 5 and 7803 DF,  p-value: 4.421e-12
+</pre><h2>Model 2: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-38.968  -7.453  -0.646   6.724  64.108 
+
+Coefficients:
+                                                 Estimate Std. Error t value
+(Intercept)                                     7.508e+01  7.703e-01  97.471
+DR1TSODI                                        3.993e-05  1.026e-04   0.389
+DR1TFIBE                                       -8.885e-03  1.923e-02  -0.462
+DR1TPOTA                                        5.338e-04  1.828e-04   2.920
+DR1TCALC                                       -1.610e-03  2.935e-04  -5.486
+DR1TMAGN                                       -3.782e-03  1.471e-03  -2.572
+RIDAGEYR                                       -1.096e-02  7.498e-03  -1.462
+RIAGENDRMale                                    1.200e+00  2.607e-01   4.602
+RIDRETH3Non-Hispanic Asian                      4.521e-01  7.240e-01   0.624
+RIDRETH3Non-Hispanic Black                      2.866e+00  5.969e-01   4.801
+RIDRETH3Non-Hispanic White                      5.803e-01  5.246e-01   1.106
+RIDRETH3Other Hispanic                          2.136e-01  6.146e-01   0.348
+RIDRETH3Other Race - Including Multi-Racial     1.402e+00  6.868e-01   2.041
+DMDEDUC2College graduate or above              -3.804e-01  4.896e-01  -0.777
+DMDEDUC2High school graduate/GED or equivalent  1.592e-01  5.001e-01   0.318
+DMDEDUC2Less than 9th grade                    -1.925e-01  7.189e-01  -0.268
+DMDEDUC2Some college or AA degree               6.051e-01  4.850e-01   1.248
+                                               Pr(>|t|)    
+(Intercept)                                     < 2e-16 ***
+DR1TSODI                                        0.69712    
+DR1TFIBE                                        0.64405    
+DR1TPOTA                                        0.00351 ** 
+DR1TCALC                                       4.25e-08 ***
+DR1TMAGN                                        0.01014 *  
+RIDAGEYR                                        0.14387    
+RIAGENDRMale                                   4.26e-06 ***
+RIDRETH3Non-Hispanic Asian                      0.53236    
+RIDRETH3Non-Hispanic Black                     1.61e-06 ***
+RIDRETH3Non-Hispanic White                      0.26862    
+RIDRETH3Other Hispanic                          0.72822    
+RIDRETH3Other Race - Including Multi-Racial     0.04126 *  
+DMDEDUC2College graduate or above               0.43724    
+DMDEDUC2High school graduate/GED or equivalent  0.75020    
+DMDEDUC2Less than 9th grade                     0.78893    
+DMDEDUC2Some college or AA degree               0.21216    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 10.92 on 7792 degrees of freedom
+Multiple R-squared:  0.01808,	Adjusted R-squared:  0.01606 
+F-statistic: 8.965 on 16 and 7792 DF,  p-value: < 2.2e-16
+</pre><h2>Model 3: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-39.844  -6.933  -0.700   6.378  64.120 
+
+Coefficients:
+                                                 Estimate Std. Error t value
+(Intercept)                                    56.9128941  1.0621750  53.581
+DR1TSODI                                       -0.0002760  0.0001189  -2.322
+DR1TFIBE                                       -0.0066773  0.0186206  -0.359
+DR1TPOTA                                        0.0005744  0.0001783   3.220
+DR1TCALC                                       -0.0017635  0.0002909  -6.063
+DR1TMAGN                                       -0.0042078  0.0014395  -2.923
+RIDAGEYR                                       -0.0003620  0.0083708  -0.043
+RIAGENDRMale                                    1.9156464  0.2568624   7.458
+RIDRETH3Non-Hispanic Asian                      1.9298165  0.7062936   2.732
+RIDRETH3Non-Hispanic Black                      3.3059508  0.5784103   5.716
+RIDRETH3Non-Hispanic White                      0.8522024  0.5071222   1.680
+RIDRETH3Other Hispanic                          0.6061837  0.5938928   1.021
+RIDRETH3Other Race - Including Multi-Racial     1.2105190  0.6637270   1.824
+DMDEDUC2College graduate or above              -0.5259133  0.4749520  -1.107
+DMDEDUC2High school graduate/GED or equivalent -0.1624055  0.4832072  -0.336
+DMDEDUC2Less than 9th grade                    -0.0228898  0.6941333  -0.033
+DMDEDUC2Some college or AA degree               0.3041723  0.4684478   0.649
+BMXBMI                                          0.2788057  0.0167072  16.688
+LBXTC                                           0.0492987  0.0028339  17.396
+BPQ150Yes                                      -1.0921335  0.3050464  -3.580
+DR1TKCAL                                        0.0007139  0.0002502   2.853
+                                               Pr(>|t|)    
+(Intercept)                                     < 2e-16 ***
+DR1TSODI                                       0.020264 *  
+DR1TFIBE                                       0.719907    
+DR1TPOTA                                       0.001285 ** 
+DR1TCALC                                       1.40e-09 ***
+DR1TMAGN                                       0.003475 ** 
+RIDAGEYR                                       0.965508    
+RIAGENDRMale                                   9.74e-14 ***
+RIDRETH3Non-Hispanic Asian                     0.006303 ** 
+RIDRETH3Non-Hispanic Black                     1.13e-08 ***
+RIDRETH3Non-Hispanic White                     0.092906 .  
+RIDRETH3Other Hispanic                         0.307430    
+RIDRETH3Other Race - Including Multi-Racial    0.068218 .  
+DMDEDUC2College graduate or above              0.268199    
+DMDEDUC2High school graduate/GED or equivalent 0.736805    
+DMDEDUC2Less than 9th grade                    0.973695    
+DMDEDUC2Some college or AA degree              0.516151    
+BMXBMI                                          < 2e-16 ***
+LBXTC                                           < 2e-16 ***
+BPQ150Yes                                      0.000345 ***
+DR1TKCAL                                       0.004336 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 10.54 on 7788 degrees of freedom
+Multiple R-squared:  0.0858,	Adjusted R-squared:  0.08346 
+F-statistic: 36.55 on 20 and 7788 DF,  p-value: < 2.2e-16
+</pre><h2>Model 4: Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)</h2><pre>
+Call:
+glm(formula = formula, family = binomial, data = obj$data)
+
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -7.834e-01  6.084e-02 -12.876  < 2e-16 ***
+DR1TSODI     4.828e-05  2.001e-05   2.412   0.0158 *  
+DR1TFIBE    -6.457e-03  3.976e-03  -1.624   0.1044    
+DR1TPOTA     7.102e-05  3.706e-05   1.916   0.0553 .  
+DR1TCALC    -2.502e-04  6.233e-05  -4.014 5.98e-05 ***
+DR1TMAGN    -5.206e-04  3.238e-04  -1.608   0.1079    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 9304.7  on 7808  degrees of freedom
+Residual deviance: 9266.5  on 7803  degrees of freedom
+AIC: 9278.5
+
+Number of Fisher Scoring iterations: 4
+</pre><h2>Model 5: Ordinal Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+              Value Std. Error t value
+DR1TSODI  3.802e-05  2.933e-05   1.296
+DR1TFIBE -5.468e-03  3.722e-03  -1.469
+DR1TPOTA  9.541e-05  5.194e-05   1.837
+DR1TCALC -2.680e-04  6.199e-05  -4.323
+DR1TMAGN -5.430e-04  3.120e-04  -1.741
+
+Intercepts:
+            Value      Std. Error t value   
+Low|Normal     -2.7772     0.0012 -2332.3572
+Normal|High     0.8053     0.0384    20.9651
+
+Residual Deviance: 12730.73 
+AIC: 12744.73 </pre><h2>Model 6: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+                                                    Value Std. Error  t value
+DR1TSODI                                        1.433e-05  3.029e-05   0.4731
+DR1TFIBE                                       -2.500e-03  3.885e-03  -0.6435
+DR1TPOTA                                        9.663e-05  6.300e-05   1.5338
+DR1TCALC                                       -2.645e-04  6.377e-05  -4.1469
+DR1TMAGN                                       -6.120e-04  3.344e-04  -1.8302
+RIDAGEYR                                       -1.840e-03  1.231e-03  -1.4951
+RIAGENDRMale                                    1.771e-01  1.686e-02  10.5075
+RIDRETH3Non-Hispanic Asian                     -1.263e-02  5.535e-03  -2.2826
+RIDRETH3Non-Hispanic Black                      3.755e-01  1.573e-02  23.8685
+RIDRETH3Non-Hispanic White                      1.813e-02  3.942e-02   0.4601
+RIDRETH3Other Hispanic                         -2.002e-03  9.903e-03  -0.2021
+RIDRETH3Other Race - Including Multi-Racial     2.096e-01  6.208e-03  33.7593
+DMDEDUC2College graduate or above              -9.338e-02  3.565e-02  -2.6195
+DMDEDUC2High school graduate/GED or equivalent -9.055e-03  3.470e-02  -0.2610
+DMDEDUC2Less than 9th grade                    -2.118e-01  3.092e-03 -68.5119
+DMDEDUC2Some college or AA degree               2.463e-02  3.479e-02   0.7079
+
+Intercepts:
+            Value      Std. Error t value   
+Low|Normal     -2.8134     0.0026 -1093.5507
+Normal|High     0.7876     0.0479    16.4568
+
+Residual Deviance: 12675.99 
+AIC: 12711.99 </pre><h2>Model 7: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+                                                    Value Std. Error   t value
+DR1TSODI                                       -4.467e-05  4.684e-05   -0.9536
+DR1TFIBE                                       -2.186e-03  3.933e-03   -0.5560
+DR1TPOTA                                        1.084e-04  6.328e-05    1.7132
+DR1TCALC                                       -3.037e-04  6.471e-05   -4.6934
+DR1TMAGN                                       -7.446e-04  3.356e-04   -2.2183
+RIDAGEYR                                       -5.433e-04  1.334e-03   -0.4072
+RIAGENDRMale                                    2.971e-01  1.977e-03  150.2948
+RIDRETH3Non-Hispanic Asian                      2.445e-01  1.007e-03  242.7472
+RIDRETH3Non-Hispanic Black                      4.638e-01  8.937e-03   51.8974
+RIDRETH3Non-Hispanic White                      6.786e-02  2.159e-02    3.1435
+RIDRETH3Other Hispanic                          6.745e-02  5.266e-03   12.8081
+RIDRETH3Other Race - Including Multi-Racial     1.893e-01  3.351e-03   56.4988
+DMDEDUC2College graduate or above              -1.042e-01  2.724e-02   -3.8236
+DMDEDUC2High school graduate/GED or equivalent -5.228e-02  4.438e-03  -11.7816
+DMDEDUC2Less than 9th grade                    -1.915e-01  1.761e-03 -108.7722
+DMDEDUC2Some college or AA degree              -1.506e-02  1.939e-02   -0.7766
+BMXBMI                                          4.603e-02  2.928e-03   15.7208
+LBXTC                                           7.860e-03  4.671e-04   16.8278
+BPQ150Yes                                      -1.558e-01  1.710e-03  -91.1170
+DR1TKCAL                                        1.369e-04  6.646e-05    2.0604
+
+Intercepts:
+            Value     Std. Error t value  
+Low|Normal     0.0542    0.0005    98.8522
+Normal|High    3.7867    0.0594    63.7076
+
+Residual Deviance: 12297.03 
+AIC: 12341.03 </pre></body></html>

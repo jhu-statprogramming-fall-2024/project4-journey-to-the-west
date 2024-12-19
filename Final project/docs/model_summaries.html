@@ -1,0 +1,151 @@
+<html><head><title>Model Summaries</title></head><body><h1>Model Summaries</h1><h2>Model 1: Linear Model (Sodium Intake and Blood Pressure)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-49.559 -12.564  -2.564  10.103 112.772 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  1.196e+02  5.089e-01 234.955   <2e-16 ***
+DR1TSODI    -1.891e-06  1.476e-04  -0.013     0.99    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 18.08 on 5818 degrees of freedom
+  (6113 observations deleted due to missingness)
+Multiple R-squared:  2.82e-08,	Adjusted R-squared:  -0.0001719 
+F-statistic: 0.0001641 on 1 and 5818 DF,  p-value: 0.9898
+</pre><h2>Model 2: Linear Model (Sodium Intake, Age, Gender, Race)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-59.225  -9.550  -1.243   7.971 100.722 
+
+Coefficients:
+                             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                 1.012e+02  9.391e-01 107.785  < 2e-16 ***
+DR1TSODI                    1.407e-04  1.337e-04   1.053    0.292    
+RIDAGEYR                    4.271e-01  9.547e-03  44.737  < 2e-16 ***
+RIAGENDRFemale             -3.926e+00  4.286e-01  -9.160  < 2e-16 ***
+RIDRETH3Other Hispanic     -3.114e-01  9.317e-01  -0.334    0.738    
+RIDRETH3Non-Hispanic White -8.701e-01  7.622e-01  -1.142    0.254    
+RIDRETH3Non-Hispanic Black  4.305e+00  9.087e-01   4.738 2.21e-06 ***
+RIDRETH3Other              -2.756e-01  1.152e+00  -0.239    0.811    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 15.18 on 5423 degrees of freedom
+  (6502 observations deleted due to missingness)
+Multiple R-squared:  0.2889,	Adjusted R-squared:  0.288 
+F-statistic: 314.8 on 7 and 5423 DF,  p-value: < 2.2e-16
+</pre><h2>Model 3: Linear Model (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)</h2><pre>
+Call:
+lm(formula = formula, data = obj$data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-59.155 -12.214  -0.999   9.790  83.857 
+
+Coefficients:
+                             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                 1.003e+02  4.860e+00  20.638  < 2e-16 ***
+DR1TSODI                   -1.223e-03  4.944e-04  -2.474 0.013463 *  
+RIDAGEYR                    3.737e-01  4.013e-02   9.312  < 2e-16 ***
+RIAGENDRFemale              3.038e-02  1.000e+00   0.030 0.975772    
+RIDRETH3Other Hispanic      8.741e-01  2.410e+00   0.363 0.716873    
+RIDRETH3Non-Hispanic White -1.190e+00  2.013e+00  -0.591 0.554500    
+RIDRETH3Non-Hispanic Black  5.103e+00  2.248e+00   2.270 0.023340 *  
+RIDRETH3Other               3.724e+00  3.244e+00   1.148 0.251132    
+BMXBMI                     -1.330e-01  6.697e-02  -1.986 0.047164 *  
+LBXTC                       4.735e-02  1.165e-02   4.063 5.08e-05 ***
+BPQ150No                    4.691e+00  1.396e+00   3.361 0.000795 ***
+DR1TKCAL                    2.352e-03  8.880e-04   2.648 0.008171 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 18.24 on 1534 degrees of freedom
+  (10387 observations deleted due to missingness)
+Multiple R-squared:  0.08029,	Adjusted R-squared:  0.07369 
+F-statistic: 12.17 on 11 and 1534 DF,  p-value: < 2.2e-16
+</pre><h2>Model 4: Logistic Regression (Sodium Intake and Blood Pressure)</h2><pre>
+Call:
+glm(formula = formula, family = binomial, data = obj$data)
+
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -1.106e+00  6.645e-02 -16.643   <2e-16 ***
+DR1TSODI    -1.935e-05  1.947e-05  -0.994     0.32    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 6384.9  on 5819  degrees of freedom
+Residual deviance: 6383.9  on 5818  degrees of freedom
+  (6113 observations deleted due to missingness)
+AIC: 6387.9
+
+Number of Fisher Scoring iterations: 4
+</pre><h2>Model 5: Ordinal Logistic Regression (Sodium Intake and Blood Pressure)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+              Value Std. Error t value
+DR1TSODI -1.301e-05  1.649e-05  -0.789
+
+Intercepts:
+            Value      Std. Error t value   
+Low|Normal     -3.9988     0.0012 -3405.4557
+Normal|High     1.1251     0.0518    21.7298
+
+Residual Deviance: 7407.667 
+AIC: 7413.667 
+(6113 observations deleted due to missingness)</pre><h2>Model 6: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+                                Value Std. Error t value
+DR1TSODI                    3.161e-05  1.846e-05   1.712
+RIDAGEYR                    5.694e-02  1.950e-03  29.193
+RIAGENDRFemale             -2.555e-01  6.255e-02  -4.085
+RIDRETH3Other Hispanic     -2.543e-01  1.686e-02 -15.090
+RIDRETH3Non-Hispanic White -2.786e-01  5.560e-02  -5.011
+RIDRETH3Non-Hispanic Black  4.920e-01  2.775e-02  17.729
+RIDRETH3Other              -2.273e-01  5.333e-03 -42.612
+
+Intercepts:
+            Value     Std. Error t value  
+Low|Normal    -2.2436    0.0092  -244.2816
+Normal|High    4.0383    0.1168    34.5611
+
+Residual Deviance: 5781.852 
+AIC: 5799.852 
+(6502 observations deleted due to missingness)</pre><h2>Model 7: Ordinal Logistic Regression (Sodium Intake, Age, Gender, Race, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake)</h2><pre>Call:
+MASS::polr(formula = formula, data = obj$data, Hess = TRUE)
+
+Coefficients:
+                                Value Std. Error t value
+DR1TSODI                   -0.0001174   0.000140 -0.8383
+RIDAGEYR                    0.0413992   0.003806 10.8772
+RIAGENDRFemale              0.1331717   0.114843  1.1596
+RIDRETH3Other Hispanic     -0.2450708   0.024922 -9.8335
+RIDRETH3Non-Hispanic White -0.2730650   0.083429 -3.2730
+RIDRETH3Non-Hispanic Black  0.3221229   0.049162  6.5522
+RIDRETH3Other               0.1611300   0.005701 28.2643
+BMXBMI                     -0.0115944   0.007715 -1.5029
+LBXTC                       0.0045657   0.001290  3.5403
+BPQ150No                    0.4330199   0.017664 24.5144
+DR1TKCAL                    0.0002530   0.000180  1.4059
+
+Intercepts:
+            Value     Std. Error t value  
+Low|Normal    -1.7685    0.0105  -169.0004
+Normal|High    3.3875    0.3277    10.3387
+
+Residual Deviance: 2151.22 
+AIC: 2177.22 
+(10387 observations deleted due to missingness)</pre></body></html>

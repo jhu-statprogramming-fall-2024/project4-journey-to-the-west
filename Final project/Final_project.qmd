@@ -1,0 +1,620 @@
+---
+title: "Final project"
+author:
+  - name: Yishan Lin
+  - name: Yingqi Wang
+  - name: Yiming Ding
+  - name: Ruiqing Cai
+date: 2024-12-11
+---
+
+## 0. Authors Information
+
+**Yishan Lin**: JHED ID: *ylin183*; Email: *ylin183\@jh.edu*\
+**Yingqi Wang**: JHED ID: *ywang911*; Email: *ywang911\@jh.edu*\
+**Yiming Ding**: JHED ID: *yding75*; Email: *yding75\@jh.edu*\
+**Ruiqing Cai**: JHED ID: *rcai9*; Email: *rcai9\@jh.edu*
+
+## 1. Data Preparation and Robust Analysis
+
+::: callout-note
+## Note
+
+In this section, data *downloading, processing,* and some *initial analysis* were conducted by using the **"functional Programming"** Paradigms
+:::
+
+```{r load required packages, warning=FALSE, include=FALSE}
+packages <- c("tidyverse", "haven", "table1", "purrr", "MASS", "caret", 
+              "randomForest", "doParallel", "mice")
+for (pkg in packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+### 1.1 Download and Initial Cleaning
+
+Data are directly downloaded from the [CDC websites](https://wwwn.cdc.gov/Nchs/Data/Nhanes). *For more information see the code*
+
+```{r loading and initial data cleaning, message=FALSE}
+# Create a folder to store all the data
+if (!dir.exists("data")) { # check if folder already exists
+  dir.create("data")
+}
+
+# Setup function to download the data
+download_and_save <- function(url, filename) {
+  filepath <- file.path("data", filename)
+  
+  if (!file.exists(filepath)) { # Check if file already exists
+    message(paste("Downloading", filename, "..."))
+    dataset <- read_xpt(url)
+    saveRDS(dataset, filepath)
+  } else {
+    message(paste(filename, "already exists. Loading from cache."))
+  }
+  
+  readRDS(filepath) # Load the dataset
+}
+ 
+# Function to clean individual datasets
+clean_dataset <- function(data, vars) {
+  data %>% dplyr::select(all_of(vars))
+}
+
+# Selecting data
+datasets <- list(
+  demo = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DEMO_L.xpt",
+    file = "demo_data.rds",
+    vars = c("SEQN", "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2")
+  ),
+  diet = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/DR1TOT_L.xpt",
+    file = "diet_data.rds",
+    vars = c("SEQN", "DR1TSODI", "DRQSDT3", "DR1TFIBE", "DR1TPOTA", "DR1TCALC", "DR1TMAGN", "DR1TKCAL")
+  ),
+  bp = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPXO_L.xpt",
+    file = "bp_data.rds",
+    vars = c("SEQN", "BPXOSY1", "BPXOSY2", "BPXOSY3", "BPXODI1", "BPXODI2", "BPXODI3")
+  ),
+  body = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BMX_L.xpt",
+    file = "body_data.rds",
+    vars = c("SEQN", "BMXBMI")
+  ),
+  lab = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/TCHOL_L.xpt",
+    file = "lab_data.rds",
+    vars = c("SEQN", "LBXTC")
+  ),
+  ques = list(
+    url = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2021/DataFiles/BPQ_L.xpt",
+    file = "ques_data.rds",
+    vars = c("SEQN", "BPQ150")
+  )
+)
+
+# Downloading, saving, and cleaning datasets
+nhanes_data <- purrr::map(datasets, function(info) {
+  raw_data <- download_and_save(info$url, info$file)
+  clean_dataset(raw_data, info$vars)
+})
+
+# Merging into single dataframe
+merged_data <- purrr::reduce(nhanes_data, dplyr::left_join, by = "SEQN")
+```
+
+### 1.2 Process and Table 1
+**Table 1:** Characteristics of Study Participants from August 2021 to August 2023
+```{r processing data and table 1, warning=FALSE}
+# Function to preprocess data
+process_data <- function(data) {
+  data %>%
+    dplyr::filter(RIDAGEYR >= 20) %>%
+    dplyr::mutate(
+      RIAGENDR = dplyr::recode_factor(RIAGENDR, `1` = "Male", `2` = "Female"),
+      RIDRETH3 = dplyr::recode_factor(
+        RIDRETH3,
+        `1` = "Mexican American",
+        `2` = "Other Hispanic",
+        `3` = "Non-Hispanic White",
+        `4` = "Non-Hispanic Black",
+        `6` = "Non-Hispanic Asian",
+        `7` = "Other Race - Including Multi-Racial"
+      ),
+      DMDEDUC2 = dplyr::recode_factor(
+        DMDEDUC2,
+        `1` = "Less than 9th grade",
+        `2` = "9-11th grade (Includes 12th grade with no diploma)",
+        `3` = "High school graduate/GED or equivalent",
+        `4` = "Some college or AA degree",
+        `5` = "College graduate or above"
+      ),
+      BPQ150 = dplyr::recode_factor(BPQ150, `1` = "Yes", `2` = "No"),
+      DRQSDT3 = dplyr::recode_factor(DRQSDT3, `3` = "Yes"),
+      sybp = rowMeans(dplyr::select(., BPXOSY1, BPXOSY2, BPXOSY3), na.rm = TRUE),
+      dibp = rowMeans(dplyr::select(., BPXODI1, BPXODI2, BPXODI3), na.rm = TRUE)
+    )
+}
+
+# Create Table 1 function
+create_table1 <- function(data) {
+  table1(~ RIDAGEYR + RIAGENDR + RIDRETH3 + DR1TSODI + DR1TPOTA + DR1TCALC + DR1TMAGN + DR1TFIBE + BMXBMI + sybp + dibp + BPQ150, data = data)
+}
+
+# Labeling data
+set_labels_and_units <- function(data, labels, units = NULL) {
+  for (var in names(labels)) {
+    label(data[[var]]) <- labels[[var]]
+  }
+  if (!is.null(units)) {
+    for (var in names(units)) {
+      units(data[[var]]) <- units[[var]]
+    }
+  }
+  return(data)
+}
+
+## Define labels and units as named lists
+labels <- list(
+  RIDAGEYR = "Age at Screening",
+  RIAGENDR = "Gender",
+  RIDRETH3 = "Race",
+  BPQ150 = "High Blood Pressure Medication",
+  sybp = "Systolic Blood Pressure",
+  dibp = "Diastolic Blood Pressure",
+  BMXBMI = "Body Mass Index"
+)
+
+units <- list(
+  RIDAGEYR = "Year",
+  sybp = "mmHg",
+  dibp = "mmHg",
+  BMXBMI = "kg/m\u00B2"
+)
+
+# Apply the data processing function
+cleaned_data <- process_data(merged_data)
+
+# Apply labels and units
+cleaned_data <- set_labels_and_units(cleaned_data, labels, units)
+
+# Generate Table 1
+create_table1(cleaned_data)
+```
+
+### 1.3 Multiple Imputation for the Missing values by Random Forest
+
+```{r Multiple Imputation}
+imputed_data_file <- "data/NHANES_imputed_data.csv"
+if (file.exists(imputed_data_file)) {
+  message("Imputed dataset exists. Loading from file.")
+  cleaned_data_imputed <- read.csv(imputed_data_file)
+} else {
+  # Perform multiple imputation
+  set.seed(123)
+  imputed_data <- mice(
+    cleaned_data, 
+    m = 10, # Number of multiple imputations
+    method = "pmm", # Predictive Mean Matching
+    maxit = 50, # Maximum number of iterations
+    seed = 123
+  )
+
+  # Check the imputed data summary
+  summary(imputed_data)
+
+  # Complete the dataset by pooling results from imputations
+  cleaned_data_imputed <- complete(imputed_data)
+
+  # Save the imputed dataset
+  write.csv(cleaned_data_imputed, imputed_data_file, row.names = FALSE)
+  message("Imputed dataset created and saved.")
+}
+```
+
+
+### 1.4 Initial Anlysis
+A stratified Analysis by gender was conducted. 
+
+```{r stratified analysis}
+# Stratification function setup
+stratified_analysis <- function(data, group_var, analysis_func) {
+  # Split data into groups
+  split_data <- split(data, data[[group_var]])
+  
+  # Apply the analysis function and add group label
+  summary_list <- map(split_data, ~ {
+    analysis_func(.x) %>%
+      mutate(Gender = unique(.x[[group_var]])) # Add group label
+  })
+  
+  # Combine all group summaries into a single table
+  combined_summary <- bind_rows(summary_list)
+  
+  # Return combined table
+  combined_summary
+}
+
+summarize_data <- function(data) {
+  data %>%
+    summarize(
+      mean_age = mean(RIDAGEYR, na.rm = TRUE),
+      mean_Na = mean(DR1TSODI, na.rm = TRUE),
+      mean_K = mean(DR1TPOTA, na.rm = TRUE),
+      mean_Mg = mean(DR1TMAGN, na.rm = TRUE),
+      mean_Ca = mean(DR1TCALC, na.rm = TRUE), 
+      mean_fiber = mean(DR1TFIBE, na.rm = TRUE),
+      mean_sbp = mean(sybp, na.rm = TRUE),
+      mean_dbp = mean(dibp, na.rm = TRUE),
+      n = n()
+    )
+}
+
+# stratified analysis by gender
+stratified_summary <- stratified_analysis(cleaned_data_imputed, "RIAGENDR", summarize_data)
+knitr::kable(stratified_summary, 
+      caption = "Table 2: Summary of each variables stratified by gender", 
+      format = "html")
+```
+
+## 2. Using S3 to Conduct Object-Oriented Programming
+
+### 2.1 Setup S3 Object for Regression Analysis
+
+```{r S3 functions}
+# Define an S3 class for blood pressure analysis
+BPAnalysis <- function(data) {
+  structure(
+    list(data = data, summaries = list()), # Store the dataset and summaries in the object
+    class = "BPAnalysis"
+  )
+}
+
+# S3 method for cleaning data - SYBP
+sybp.BPAnalysis <- function(obj) {
+  obj$data <- obj$data %>%
+    mutate(
+      BP_Category = factor(case_when(
+        sybp < 90 ~ "Low",
+        sybp >= 90 & sybp <= 130 ~ "Normal",
+        sybp > 130 ~ "High"
+      ), levels = c("Low", "Normal", "High")),
+      BP_Binary = ifelse(sybp > 130, 1, 0)
+    )
+  obj
+}
+
+# S3 method for cleaning data - DIBP
+dibp.BPAnalysis <- function(obj) {
+  obj$data <- obj$data %>%
+    mutate(
+      BP_Category = factor(case_when(
+        dibp < 60 ~ "Low",
+        dibp >= 60 & dibp <= 80 ~ "Normal",
+        dibp > 80 ~ "High"
+      ), levels = c("Low", "Normal", "High")),
+      BP_Binary = ifelse(dibp > 80, 1, 0)
+    )
+  obj
+}
+
+# S3 method for modeling with condition-based formulas
+model.BPAnalysis <- function(obj, type = "linear", 
+                             variables = c("DR1TSODI", "DR1TFIBE", "DR1TPOTA", 
+                                           "DR1TCALC", "DR1TMAGN"), 
+                             response = "sybp") {
+  # Base formula
+  response <- if (type == "logistic") "BP_Binary" else if (type == "ordinal") "BP_Category" else response
+  formula <- as.formula(paste(response, "~", paste(variables, collapse = " + ")))
+  
+  if (type == "linear") {
+    obj$model <- lm(formula, data = obj$data)
+  } else if (type == "logistic") {
+    obj$model <- glm(formula, data = obj$data, family = binomial)
+  } else if (type == "ordinal") {
+    obj$model <- MASS::polr(formula, data = obj$data, Hess = TRUE)
+  } else {
+    stop("Invalid model type.")
+  }
+  obj
+}
+
+# S3 method for summarizing results
+summary.BPAnalysis <- function(obj, model_description) {
+  if (is.null(obj$model)) {
+    stop("No model has been created yet.")
+  }
+  obj$summaries[[model_description]] <- capture.output(summary(obj$model))
+  obj
+}
+
+# Extend S3 to handle all seven models for a given response variable
+run_models.BPAnalysis <- function(obj, response = "sybp") {
+  dietary_intake <- c("DR1TSODI", "DR1TFIBE", "DR1TPOTA", "DR1TCALC", "DR1TMAGN")
+  models <- list(
+    list(type = "linear", variables = c(dietary_intake), 
+         description = "Model 1: Linear Model (5 Dietary Intake Nutrients and Blood Pressure)"),
+    list(type = "linear", 
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2"), 
+         description = "Model 2: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"),
+    list(type = "linear", 
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2", 
+                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL", "DR1TSODI"), 
+         description = "Model 3: Linear Model (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)"),
+    list(type = "logistic", variables = c(dietary_intake), 
+         description = "Model 4: Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"),
+    list(type = "ordinal", variables = c(dietary_intake), 
+         description = "Model 5: Ordinal Logistic Regression (5 Dietary Intake Nutrients and Blood Pressure)"),
+    list(type = "ordinal", 
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2"), 
+         description = "Model 6: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level)"),
+    list(type = "ordinal", 
+         variables = c(dietary_intake, "RIDAGEYR", "RIAGENDR", "RIDRETH3", "DMDEDUC2", 
+                       "BMXBMI", "LBXTC", "BPQ150", "DR1TKCAL", "DR1TSODI"), 
+         description = "Model 7: Ordinal Logistic Regression (5 Dietary Intake Nutrients, Age, Gender, Race, Education Level, BMI, Total Cholesterol, High Blood Pressure Medication, Calories Intake, Low Sodium Meal)")
+  )
+
+  for (model in models) {
+    obj <- model.BPAnalysis(obj, type = model$type, variables = model$variables, response = response)
+    obj <- summary.BPAnalysis(obj, model$description)
+  }
+
+  obj
+}
+
+# Function to output all summaries as HTML
+output_summaries <- function(obj, output_file = "model_summaries.html") {
+  html_content <- "<html><head><title>Model Summaries</title></head><body><h1>Model Summaries</h1>"
+
+  for (model_name in names(obj$summaries)) {
+    html_content <- paste0(
+      html_content,
+      "<h2>", model_name, "</h2>",
+      "<pre>", paste(obj$summaries[[model_name]], collapse = "\n"), "</pre>"
+    )
+  }
+
+  html_content <- paste0(html_content, "</body></html>")
+  writeLines(html_content, output_file)
+  message("Summaries written to ", output_file)
+}
+```
+
+### 2.2 Systolic Blood Pressure
+
+```{r S3 sybp, warning=FALSE}
+# Run SYBP analysis
+sybp_obj <- BPAnalysis(cleaned_data_imputed)
+sybp_obj <- sybp.BPAnalysis(sybp_obj)
+sybp_obj <- run_models.BPAnalysis(sybp_obj, response = "sybp")
+output_summaries(sybp_obj, output_file = "sybp_model_summaries.html")
+```
+<a href="sybp_model_summaries.html">View Model Summaries in `sybp_model_summaries.html`</a>
+
+### 2.3 Diastolic Blood Pressure
+
+```{r S3 dibp, warning=FALSE}
+# Run DIBP analysis
+dibp_obj <- BPAnalysis(cleaned_data_imputed)
+dibp_obj <- dibp.BPAnalysis(dibp_obj)
+dibp_obj <- run_models.BPAnalysis(dibp_obj, response = "dibp")
+output_summaries(dibp_obj, output_file = "dibp_model_summaries.html")
+```
+
+<a href="dibp_model_summaries.html">View Model Summaries in `dibp_model_summaries.html`</a>
+
+## 3. Visualization
+### 3.1 Distribution of Systolic Blood Pressure stratified by Gender
+Using `geom_histogram`
+```{r visualization 1, warning=FALSE}
+# Violin Plot of Systolic Blood Pressure by Education Level
+ggplot(cleaned_data_imputed, aes(x = DMDEDUC2, y = sybp, fill = DMDEDUC2)) +
+  geom_violin(trim = FALSE) +  # Add violin plot without trimming
+  scale_fill_brewer(palette = "Set3") +
+  labs(
+    title = "Violin Plot of Systolic Blood Pressure by Education Status",
+    x = "Education Level",
+    y = "Systolic Blood Pressure (mmHg)",
+    fill = "Education Levels"
+  ) +
+  theme_classic() +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_blank()
+  )
+```
+
+### 3.2 Distribution of Sodium Intake stratified by Gender
+Using `geom_boxplot` to create box plot and `geom_text` to label
+
+```{r visualization 2, warning=FALSE}
+medians <- cleaned_data_imputed %>%
+  group_by(RIAGENDR) %>%
+  summarize(median_sodium = median(DR1TSODI, na.rm = TRUE))
+
+# Visualization 2: Boxplot of Sodium Intake (DR1TSODI) by Gender
+ggplot(cleaned_data_imputed, aes(x = RIAGENDR, y = DR1TSODI, fill = RIAGENDR)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("#94f0ff", "#ffa394")) +
+  labs(
+    title = "Sodium Intake by Gender",
+    x = "Gender",
+    y = "Sodium Intake (mg)"
+  ) +
+  geom_text(
+    data = medians,
+    aes(x = RIAGENDR, y = median_sodium, label = round(median_sodium, 1)),
+    vjust = -0.5,
+    size = 3
+  ) +
+  theme_classic()
+```
+
+### 3.2 Relationship between Sodium Intake and Diastolic Blood Pressure
+Using `geom_point` to create scatter plot
+
+```{r visualization 3, warning=FALSE}
+# Visualization 3: Relationship between Sodium Intake and Diastolic Blood Pressure (dibp)
+ggplot(cleaned_data_imputed, aes(x = DR1TPOTA, y = dibp, color = RIDRETH3)) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(values = c("#E69F00", "#009E73", "#56B4E9", "#0072B2", "#D55E00", "#CC79A7")) +
+  labs(
+    title = "Relationship between Sodium Intake and Diastolic Blood Pressure by Race",
+    x = "Potassium Intake (mg)",
+    y = "Diastolic Blood Pressure (mmHg)",
+    color = "Race"
+  ) +
+  theme_classic()
+```
+
+## 4. Machine Learning: Random Forest to Predict Blood Pressure
+
+### 4.1 Model Implementation with Random Forest
+
+```{r machine learning, warning=FALSE}
+# Create simplified blood pressure category in cleaned_data_imputed
+cleaned_data_imputed <- cleaned_data_imputed %>%
+  # Create BP_Category for sybp
+  mutate(
+    BP_Category_SYBP = factor(case_when(
+      sybp <= 130 ~ "Normal",
+      sybp > 130 ~ "High"
+    ), levels = c("Normal", "High")),
+    
+    # Create BP_Category for dibp
+    BP_Category_DIBP = factor(case_when(
+      dibp <= 80 ~ "Normal",
+      dibp > 80 ~ "High"
+    ), levels = c("Normal", "High")),
+    
+    # Combine into a single BP_Category
+    BP_Category = case_when(
+      BP_Category_SYBP == "High" | BP_Category_DIBP == "High" ~ "High",
+      TRUE ~ "Normal" # Default fallback
+    )
+  ) %>%
+  # Convert to factor for training
+  mutate(BP_Category = factor(BP_Category, levels = c("Normal", "High")))
+
+# Parallel processing setup
+cores <- detectCores() - 1 # Reserve 1 core for system processes
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
+# Prepare the dataset
+
+features <- cleaned_data_imputed %>% 
+  dplyr::select(
+    c(RIDAGEYR, RIAGENDR, RIDRETH3, DMDEDUC2, DR1TSODI, DR1TFIBE, DR1TPOTA, 
+      DR1TCALC, DR1TMAGN, DR1TKCAL, BMXBMI, LBXTC, BPQ150) 
+  )
+
+target_sybp <- cleaned_data_imputed$BP_Category_SYBP  # Target for systolic blood pressure
+target_dibp <- cleaned_data_imputed$BP_Category_DIBP  # Target for diastolic blood pressure
+target_bp <- cleaned_data_imputed$BP_Category
+
+# Combine features and targets into separate datasets for training
+data_for_model_sybp <- cbind(features, sybp = target_sybp)
+data_for_model_dibp <- cbind(features, dibp = target_dibp)
+data_for_model_bp <- cbind(features, bp = target_bp)
+
+# Split data into training and testing sets
+set.seed(20241217)
+train_index_sybp <- createDataPartition(data_for_model_sybp$sybp, p = 0.8, list = FALSE)
+train_data_sybp <- data_for_model_sybp[train_index_sybp, ]
+test_data_sybp <- data_for_model_sybp[-train_index_sybp, ]
+
+train_index_dibp <- createDataPartition(data_for_model_dibp$dibp, p = 0.8, list = FALSE)
+train_data_dibp <- data_for_model_dibp[train_index_dibp, ]
+test_data_dibp <- data_for_model_dibp[-train_index_dibp, ]
+
+train_index_bp <- createDataPartition(data_for_model_bp$bp, p = 0.8, list = FALSE)
+train_data_bp <- data_for_model_bp[train_index_bp, ]
+test_data_bp <- data_for_model_bp[-train_index_bp, ]
+
+# Train Random Forest model for SYBP
+set.seed(20241217)
+rf_model_sybp <- randomForest(
+  sybp ~ ., # Predict systolic blood pressure
+  data = train_data_sybp,
+  ntree = 250,
+  importance = TRUE
+)
+
+# Train Random Forest model for DIBP
+set.seed(20241217)
+rf_model_dibp <- randomForest(
+  dibp ~ ., # Predict diastolic blood pressure
+  data = train_data_dibp,
+  ntree = 250,
+  importance = TRUE
+)
+
+set.seed(20241217)
+rf_model_bp <- randomForest(
+  bp ~ ., # Predict diastolic blood pressure
+  data = train_data_bp,
+  ntree = 250,
+  importance = TRUE
+)
+
+# Stop parallel processing
+stopCluster(cl)
+```
+
+### 4.2 Systolic Blood Pressure Prediction Performance
+
+```{r Systolic Blood Pressure Prediction Performance, warning=FALSE}
+# Make predictions on the test data
+predicted_sybp <- predict(rf_model_sybp, test_data_sybp)
+actual_sybp <- test_data_sybp$sybp
+
+# Evaluate model performance
+confusion_matrix_sybp <- caret::confusionMatrix(predicted_sybp, actual_sybp)
+print(confusion_matrix_sybp)
+
+# Variable importance
+importance <- importance(rf_model_sybp)
+varImpPlot(rf_model_sybp)
+```
+
+### 4.3 Diastolic Blood Pressure Prediction Performance
+
+```{r Diastolic Blood Pressure Prediction Performance, warning=FALSE}
+# Make predictions on the test data
+predicted_dibp <- predict(rf_model_dibp, test_data_dibp)
+actual_dibp <- test_data_dibp$dibp
+
+# Evaluate model performance
+confusion_matrix_dibp <- caret::confusionMatrix(predicted_dibp, actual_dibp)
+print(confusion_matrix_dibp)
+
+# Variable importance
+importance <- importance(rf_model_dibp)
+varImpPlot(rf_model_dibp)
+```
+
+### 4.4 hypertension Prediction Performance
+
+```{r hypertension Prediction Performance}
+# Make predictions on the test data
+predicted_bp <- predict(rf_model_bp, test_data_bp)
+actual_bp <- test_data_bp$bp
+
+# Evaluate model performance
+confusion_matrix_bp <- caret::confusionMatrix(predicted_bp, actual_bp)
+print(confusion_matrix_bp)
+
+# Variable importance
+importance <- importance(rf_model_bp)
+varImpPlot(rf_model_bp)
+```
+
+
