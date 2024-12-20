@@ -1,29 +1,4 @@
-# Project 4: Association Between Dietary Sodium Intake and Blood Pressure in Adults Using NHANES Data
-
-## Overview
-This project examines the correlation between dietary sodium intake and blood pressure levels in U.S. adults using the NHANES dataset (2017–2018). It investigates the role of sodium as a modifiable factor in managing hypertension and its associated risks, such as cardiovascular diseases.
-
-The study involves the following:
-1. Data preprocessing and integration using shell scripting and R.
-2. Statistical analysis using linear regression models to explore the relationship between sodium intake and blood pressure.
-3. Interactive visualization using Shiny for exploring demographic variations in the association.
-
-## Requirements
-- R version 4.0 or higher
-- Required R packages:
-  - `tidyverse`
-  - `labelled`
-  - `tableone`
-  - `shiny`
-  - `quarto`
-- A terminal with basic shell utilities (`curl`, `unzip`, `awk`, `sed`)
-
-## Installation
-To install the required R packages, run the following command in R:
-
-```r
-install.packages(c("tidyverse", "labelled", "tableone", "shiny", "quarto"))
-```
+# Project 4: Dietary Nutrient Intake and Blood Pressure Prediction
 
 ## Authors
 - **Yishan Lin**: ylin183@jh.edu, JHED ID: ylin183
@@ -31,32 +6,61 @@ install.packages(c("tidyverse", "labelled", "tableone", "shiny", "quarto"))
 - **Yingqi Wang**: ywang911@jh.edu, JHED ID: ywang911
 - **Ruiqing Cai**: rcai9@jh.edu, JHED ID: rcai9
 
-## Files
-- `project4_analysis.qmd`: Quarto Markdown file containing the analysis code.
-- `rendered_output.htm`l: HTML file summarizing the results and findings.
-- `shiny_app/`: Directory containing the Shiny app files for interactive visualization.
-- `scripts/`:Shell scripts for downloading and preprocessing NHANES datasets.
-- `data/`: Directory containing the processed data.
+## Overview
+This project investigates the relationships between dietary nutrient intake and blood pressure levels using data from the NHANES (2021–2023) dataset. Hypertension is a significant risk factor for cardiovascular diseases, and understanding dietary influences can help guide public health strategies.
 
-## Analysis Workflow
-- Data Download and Preprocessing:
-Shell scripts automate downloading NHANES datasets and filtering for key variables.
+### Objectives
+- Statistical Analysis: Explore associations between sodium, potassium, calcium, magnesium, fiber, and blood pressure (systolic and diastolic).
+- Machine Learning: Build a predictive model to identify hypertension risk based on demographic and dietary factors.
 
-- Data is merged and cleaned using R.
+## Methods
+### Data Preparation
+- Utilized NHANES datasets for demographic, dietary, and laboratory data.
+- Imputed missing values using Predictive Mean Matching (PMM) to ensure completeness.
+- Stratified analysis by demographic factors to provide subgroup insights.
+### Statistical Models
+- Regression models to identify significant nutrient-blood pressure relationships.
+- Functional programming approaches (e.g., reusable functions for cleaning and processing) were implemented for reproducibility.
+### Machine Learning
+- Random Forest models trained on demographic and dietary variables to predict:
+  - Systolic Blood Pressure (SYBP)
+  - Diastolic Blood Pressure (DIBP)
+  - Combined Blood Pressure Category (Normal/High)
+- Parallel processing was used to improve computational efficiency.
 
-## Statistical Analysis:
-- Linear regression models are used to explore associations between dietary sodium intake and blood pressure, adjusting for covariates such as age, sex, race, BMI, and cholesterol levels.
+## Key Results
+1. **Statistical Analysis:**
+   - Sodium intake showed a weak negative association with blood pressure.
+2. **Machine Learning:**
+   - Predictive performance for binary blood pressure outcomes:
+     - Sensitivity for "Normal" classification was high (~96%).
+     - Specificity for "High" classification was limited (~10–39%).
+   - Random Forest models highlighted age and BMI as the most critical predictors.
+3. **Dashboard Insights:**
+   - Dynamic visualization options (e.g., violin plots, scatterplots) provided granular insights into nutrient-blood pressure interactions.
 
-## Visualization:
-- Shiny dashboard provides an interactive interface for exploring the results by demographic groups.
-- Histogram of sodium intake and other plots summarize key findings.
+## Technical Highlights
+- **Programming Paradigms:** Functional and object-oriented approaches streamlined workflows.
+- **Parallel Processing:** Boosted computational efficiency for machine learning.
+- **Visualization:** An interactive dashboard enhanced data accessibility and usability.
 
-## Deliverables
+## Requirements
+- **R version 4.0 or higher**
+- **Required R packages:**
+  - `tidyverse`
+  - `randomForest`
+  - `caret`
+  - `doParallel`
+  - `mice`
+  - `quarto`
+- **Running the Code**
+  - Clone this repository.
+  - Open the `Final_project.qmd` file to explore data preparation, statistical models, and machine learning implementations.
+  - Launch the dashboard with `Interactive Dashboard.qmd`.
+- **Accessing Output**
+  - Summaries and visualizations are available in the `Final project.html` files
+  - The `Final Project Write up.pdf` contains a comprehensive report.
 
-- Quarto Website: Comprehensive report with visualizations and results.
-Interactive Dashboard: Shiny app for exploring sodium and blood pressure associations.
-- GitHub Repository: All code, data, and documentation.
-
-##License
+## License
 This project is for educational purposes and uses NHANES data, which is publicly available under the CDC guidelines for non-commercial use. '
 
